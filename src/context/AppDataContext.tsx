@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CLINIC_BRANCHES as INITIAL_BRANCHES } from '@/data/branches';
+
 import { apiService } from '@/services/apiService';
 import { patientService } from '@/services/patientService';
 import { appointmentService } from '@/services/appointmentService';
@@ -90,7 +90,7 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [branches, setBranches] = useState<ClinicBranch[]>(INITIAL_BRANCHES);
+  const [branches, setBranches] = useState<ClinicBranch[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [settings, setSettings] = useState<AppSettings>(INITIAL_SETTINGS);
 
@@ -123,8 +123,7 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }));
         setMedicalRecords(medicalRecordsWithInitials);
 
-        // If no branches in DB, keep INITIAL_BRANCHES
-        if (branchesData && branchesData.length > 0) {
+        if (branchesData) {
           setBranches(branchesData.map((b: any) => apiService.prepareBranch(b)));
         }
 

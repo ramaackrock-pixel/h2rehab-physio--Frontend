@@ -21,11 +21,7 @@ import {
   X
 } from 'lucide-react';
 import { useAppData } from '@/context/AppDataContext';
-import {
-  ATTENDANCE_RECORDS,
-  STAFF_SCHEDULES,
-  PAYROLL_RECORDS
-} from '../data/staff';
+
 import type { StaffTab, AttendanceStatus, ShiftType } from '../types/staff';
 import StaffModal from '@/components/dashboard/StaffModal';
 import { useSearch } from '@/context/SearchContext';

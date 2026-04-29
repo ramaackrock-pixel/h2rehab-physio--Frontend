@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Calendar, FileText, CreditCard, UserCircle, BarChart2, Settings, LogOut, ChevronDown, TrendingUp, Stethoscope } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, FileText, CreditCard, UserCircle, BarChart2, Settings, LogOut, ChevronDown, TrendingUp, Stethoscope, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -37,6 +37,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { name: 'Billing', icon: <CreditCard size={18} />, href: '/billing', roles: ['superadmin', 'admin'] },
     { name: 'Staff', icon: <UserCircle size={18} />, href: '/staff', roles: ['superadmin', 'admin', 'staff'] },
     { name: 'Reports', icon: <BarChart2 size={18} />, href: '/reports', roles: ['superadmin', 'staff'] },
+    { name: 'Branches', icon: <Building2 size={18} />, href: '/branches', roles: ['superadmin'] },
     { name: 'Settings', icon: <Settings size={18} />, href: '/settings', roles: ['superadmin'] },
   ];
 
