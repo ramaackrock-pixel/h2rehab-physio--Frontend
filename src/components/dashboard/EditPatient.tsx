@@ -288,6 +288,24 @@ export default function EditPatient({ patient, allPatients, isOpen, onClose, onS
                     <option value="DISCHARGED">DISCHARGED</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Last Visit</label>
+                  <input 
+                    type="date" 
+                    name="lastVisit"
+                    value={(() => {
+                      if (!formData.lastVisit) return '';
+                      try {
+                        const d = new Date(formData.lastVisit);
+                        return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
+                      } catch {
+                        return '';
+                      }
+                    })()}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
+                  />
+                </div>
               </div>
 
               <div className="mt-8 pt-6 border-t border-slate-100">

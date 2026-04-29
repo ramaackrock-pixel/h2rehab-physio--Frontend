@@ -11,6 +11,7 @@ export interface Invoice {
   paidAmount: number;
   dueAmount: number;
   status: InvoiceStatus;
+  branch?: string;
 }
 
 export interface BillingStat {

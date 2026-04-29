@@ -9,7 +9,7 @@ export function StatCards({ branch, timeRange }: { branch: string, timeRange?: s
   const isStaff = user?.role === 'staff';
 
   const patients = (branch === 'All Branches' ? allPatients : allPatients.filter(p => p.branch === branch))
-    .filter(p => timeRange ? isWithinTimeRange(p.lastVisit, timeRange) : true);
+    .filter(p => timeRange ? isWithinTimeRange(p.createdAt || p.lastVisit, timeRange) : true);
   const appointments = (branch === 'All Branches' ? allAppointments : allAppointments.filter(a => a.branch === branch))
     .filter(a => timeRange ? isWithinTimeRange(a.appointmentDate, timeRange) : true);
   const staff = branch === 'All Branches' ? allStaff : allStaff.filter(s => s.branch === branch);

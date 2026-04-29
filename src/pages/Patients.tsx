@@ -20,7 +20,6 @@ export function Patients() {
   const navigate = useNavigate();
   const [branchFilter, setBranchFilter] = useState('All Branches');
   const [statusFilter, setStatusFilter] = useState('All Statuses');
-  const [dateFilter, setDateFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [editingPatient, setEditingPatient] = useState<any>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -56,10 +55,9 @@ export function Patients() {
       const matchesSearch = nameMatch || idMatch;
       const matchesBranch = branchFilter === 'All Branches' || p.branch === branchFilter;
       const matchesStatus = statusFilter === 'All Statuses' || p.status === statusFilter;
-      const matchesDate = !dateFilter || p.lastVisit.includes(dateFilter);
-      return matchesSearch && matchesBranch && matchesStatus && matchesDate;
+      return matchesSearch && matchesBranch && matchesStatus;
     });
-  }, [patients, searchQuery, branchFilter, statusFilter, dateFilter]);
+  }, [patients, searchQuery, branchFilter, statusFilter]);
 
   const totalPages = Math.ceil(filteredPatients.length / ITEMS_PER_PAGE) || 1;
   const paginatedPatients = useMemo(() => {
@@ -92,7 +90,6 @@ export function Patients() {
   const handleClearFilters = () => {
     setBranchFilter('All Branches');
     setStatusFilter('All Statuses');
-    setDateFilter('');
     setCurrentPage(1);
   };
 
@@ -114,7 +111,7 @@ export function Patients() {
         </button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-end">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4 mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-end">
         <div className="w-full">
           <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Branch Location</label>
           <div className="relative">
@@ -148,17 +145,6 @@ export function Patients() {
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           </div>
-        </div>
-
-        <div className="w-full">
-          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Last Visit Date</label>
-          <input 
-            type="text" 
-            placeholder="mm/dd/yyyy"
-            value={dateFilter}
-            onChange={(e) => { setDateFilter(e.target.value); setCurrentPage(1); }}
-            className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#5ab2b2] placeholder:text-slate-400 font-medium" 
-          />
         </div>
 
         <button 

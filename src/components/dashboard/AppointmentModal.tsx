@@ -34,7 +34,7 @@ export default function AppointmentModal({ appointment, isOpen, onClose, onSave 
 
   useEffect(() => {
     if (appointment) {
-      const dateStr = appointment.appointmentDate || appointment.date;
+      const dateStr = appointment.appointmentDate || (appointment as any).date;
       const formattedDate = dateStr ? new Date(dateStr).toISOString().split('T')[0] : '';
       setFormData({ ...appointment, appointmentDate: formattedDate });
     } else {
