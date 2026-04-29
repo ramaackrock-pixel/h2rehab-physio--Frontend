@@ -56,7 +56,7 @@ export default function EditPatient({ patient, allPatients, isOpen, onClose, onS
     id: '',
     contact: '',
     demographics: '',
-    branch: branches[0]?.name || '',
+    branch: '',
     status: 'ACTIVE',
     consultedBy: doctors[0]?.name || '',
     lastVisit: new Date().toLocaleDateString('en-US'),
@@ -71,20 +71,22 @@ export default function EditPatient({ patient, allPatients, isOpen, onClose, onS
 
   useEffect(() => {
     if (patient) {
-      setFormData(patient);
+      setFormData({
+        ...patient,
+        assessmentType: patient.assessmentType || 'GENERAL'
+      });
       setStep(1);
     } else {
-      const generatedId = `H2F-${Math.floor(1000 + Math.random() * 9000)}`;
       setFormData({
         name: '',
-        pid: generatedId,
+        pid: '', // Will be generated once branch is selected
         id: '',
         contact: '',
         demographics: '',
-        branch: branches[0]?.name || '',
+        branch: '',
         status: 'ACTIVE',
-        consultedBy: 'Dr. Elias Thorne',
-        lastVisit: new Date().toLocaleDateString('en-US'),
+        consultedBy: doctors[0]?.name || 'Dr. Elias Thorne',
+        lastVisit: new Date().toISOString().split('T')[0],
         assessmentType: 'GENERAL',
         address: '',
         diseases: [],
@@ -94,7 +96,20 @@ export default function EditPatient({ patient, allPatients, isOpen, onClose, onS
       setStep(1);
     }
     setError(null);
-  }, [patient, isOpen, branches]);
+  }, [patient, isOpen, branches, doctors]);
+
+  useEffect(() => {
+    // Generate branch-based ID for NEW patients when branch selection changes
+    if (!patient && formData.branch && isOpen) {
+      const selectedBranch = branches.find(b => b.name === formData.branch);
+      if (selectedBranch) {
+        const branchCode = selectedBranch.branchCode || '00';
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        const generatedId = `H2F-${branchCode}-${randomNum}`;
+        setFormData(prev => ({ ...prev, pid: generatedId }));
+      }
+    }
+  }, [formData.branch, patient, branches, isOpen]);
 
   if (!isOpen) return null;
 
@@ -204,15 +219,15 @@ export default function EditPatient({ patient, allPatients, isOpen, onClose, onS
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Patient ID (Optional)</label>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Patient ID (Auto-generated)</label>
                   <input 
                     type="text" 
                     name="pid"
                     value={formData.pid || ''}
                     onChange={handleChange}
-                    placeholder="Auto-generated if empty"
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
-                    disabled={!!patient}
+                    placeholder="Select branch to generate ID"
+                    className="w-full bg-slate-100 border border-slate-200 text-[#5ab2b2] text-sm rounded-lg px-4 py-2.5 focus:outline-none font-bold transition-all"
+                    readOnly
                   />
                 </div>
                 <div>
@@ -261,6 +276,32 @@ export default function EditPatient({ patient, allPatients, isOpen, onClose, onS
                       <option key={doc.id} value={doc.name}>{doc.name}</option>
                     ))}
                   </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Clinic Branch</label>
+                  <select 
+                    name="branch"
+                    value={formData.branch || ''}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
+                    required
+                  >
+                    <option value="">Select Branch</option>
+                    {branches.map(b => (
+                      <option key={b.id} value={b.name}>{b.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Registration / Last Visit</label>
+                  <input 
+                    type="date" 
+                    name="lastVisit"
+                    value={formData.lastVisit || ''}
+                    onChange={handleChange}
+                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
+                    required
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Address</label>

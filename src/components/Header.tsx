@@ -17,6 +17,7 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const filteredPatients = patients.filter(p => 
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.pid && p.pid.toLowerCase().includes(searchQuery.toLowerCase())) ||
     p.id.toLowerCase().includes(searchQuery.toLowerCase())
   ).slice(0, 5);
 
@@ -96,7 +97,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                     </div>
                     <div className="flex-1">
                       <div className="text-sm font-bold text-slate-800 group-hover:text-[#5ab2b2] transition-colors">{patient.name}</div>
-                      <div className="text-[10px] text-slate-500 font-medium">{patient.id} • {patient.branch}</div>
+                      <div className="text-[10px] text-slate-500 font-medium">{patient.pid || patient.id} • {patient.branch}</div>
                     </div>
                     <div className="text-[10px] font-black text-slate-300 group-hover:text-[#5ab2b2]">VIEW</div>
                   </button>

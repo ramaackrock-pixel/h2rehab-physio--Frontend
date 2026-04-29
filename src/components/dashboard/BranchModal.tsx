@@ -11,22 +11,22 @@ interface BranchModalProps {
 export default function BranchModal({ isOpen, onClose, onSave }: BranchModalProps) {
   const [formData, setFormData] = useState<any>({
     name: '',
+    branchCode: '',
     address: '',
     manager: '',
     phone: '',
-    status: 'Active' as BranchStatus,
-    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop'
+    status: 'Active' as BranchStatus
   });
 
   useEffect(() => {
     if (isOpen) {
       setFormData({
         name: '',
+        branchCode: '',
         address: '',
         manager: '',
         phone: '',
-        status: 'Active',
-        image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop'
+        status: 'Active'
       });
     }
   }, [isOpen]);
@@ -55,17 +55,31 @@ export default function BranchModal({ isOpen, onClose, onSave }: BranchModalProp
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Branch Name</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="e.g. Eastside Wellness"
-                className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Branch Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="e.g. Kilpauk"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Branch Code</label>
+                <input
+                  type="text"
+                  name="branchCode"
+                  value={formData.branchCode}
+                  onChange={handleChange}
+                  placeholder="e.g. 01"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-bold transition-all"
+                  required
+                />
+              </div>
             </div>
 
             <div>
@@ -115,9 +129,9 @@ export default function BranchModal({ isOpen, onClose, onSave }: BranchModalProp
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Branch Status</label>
                 <select
                   name="status"
                   value={formData.status}
@@ -128,19 +142,6 @@ export default function BranchModal({ isOpen, onClose, onSave }: BranchModalProp
                   <option value="Maintenance">Maintenance</option>
                   <option value="Expanding">Expanding</option>
                 </select>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Header Image URL</label>
-                <div className="relative">
-                  <Image size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
-                  />
-                </div>
               </div>
             </div>
           </div>

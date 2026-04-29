@@ -102,13 +102,15 @@ export function Branches() {
                 <div className="w-12 h-12 rounded-xl bg-[#5ab2b2]/10 flex items-center justify-center text-[#5ab2b2] font-black text-lg">
                   {branch.name[0]}
                 </div>
-                <button className="p-2 text-slate-300 hover:text-slate-600 rounded-lg hover:bg-slate-50 transition-all">
-                  <MoreVertical size={16} />
-                </button>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-xl font-bold text-slate-800">{branch.name}</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-slate-800">{branch.name}</h3>
+                  <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold border border-slate-200">
+                    BRANCH CODE: {branch.branchCode}
+                  </span>
+                </div>
                 
                 <div className="flex items-start space-x-2 text-slate-500">
                   <MapPin size={16} className="mt-0.5 flex-shrink-0 text-[#5ab2b2]" />
