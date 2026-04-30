@@ -12,7 +12,7 @@ export const billingService = {
   },
 
   update: async (id: string, invoiceData: any) => {
-    const response = await apiService.put(`/billing/${id}`, invoiceData);
+    const response = await apiService.patch(`/billing/${id}`, invoiceData);
     return response.invoice;
   },
 

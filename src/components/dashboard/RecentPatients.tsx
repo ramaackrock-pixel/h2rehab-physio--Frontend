@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { isWithinTimeRange } from '@/utils/dateFilter';
 
-export function RecentPatients({ branch, timeRange }: { branch: string, timeRange?: string }) {
+export function 
+RecentPatients({ branch, timeRange }: { branch: string, timeRange?: string }) {
   const { patients: allPatients } = useAppData();
   const { user } = useAuth();
   const isStaff = user?.role === 'staff';

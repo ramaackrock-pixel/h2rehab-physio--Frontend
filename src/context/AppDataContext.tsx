@@ -114,7 +114,11 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setPatients((patientsData || []).map((p: any) => apiService.preparePatient({ ...p, id: p._id })));
         setAppointments((appointmentsData || []).map((a: any) => apiService.prepareAppointment({ ...a, id: a._id || a.id })));
         setStaff((staffData || []).map((s: any) => ({ ...s, id: s._id || s.id })));
-        setInvoices((invoicesData || []).map((i: any) => ({ ...i, id: i._id || i.id })));
+        setInvoices((invoicesData || []).map((i: any) => ({ 
+          ...i, 
+          id: i._id || i.id,
+          pid: i.patientId // Ensure linking by patientId
+        })));
         const medicalRecordsWithInitials = (recordsData || []).map((r: any) => ({
           ...r,
           id: r._id || r.id,
@@ -263,7 +267,11 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const addInvoice = async (invoice: Invoice) => {
     try {
       const created = await billingService.create(invoice);
-      const invoiceWithId = { ...created, id: created._id || created.id };
+      const invoiceWithId = { 
+        ...created, 
+        id: created._id || created.id,
+        pid: created.patientId 
+      };
       setInvoices(prev => [invoiceWithId, ...prev]);
     } catch (err) {
       console.error("Failed to add invoice", err);
@@ -272,7 +280,11 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateInvoice = async (invoice: Invoice) => {
     try {
       const updated = await billingService.update(invoice.id, invoice);
-      const invoiceWithId = { ...updated, id: updated._id || updated.id };
+      const invoiceWithId = { 
+        ...updated, 
+        id: updated._id || updated.id,
+        pid: updated.patientId 
+      };
       setInvoices(prev => prev.map(i => i.id === invoice.id ? invoiceWithId : i));
     } catch (err) {
       console.error("Failed to update invoice", err);

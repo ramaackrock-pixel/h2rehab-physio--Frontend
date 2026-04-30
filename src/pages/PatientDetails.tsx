@@ -33,13 +33,19 @@ export function PatientDetails() {
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
 
   const patient = patients.find(p => p.id === id);
-  const patientAppointments = allAppointments.filter(a => a.patientName === patient?.name || a.pid === patient?.pid);
-  const patientRecords = (medicalRecords || []).filter(r => r.pid === patient?.id || r.patientName === patient?.name);
+  const patientAppointments = allAppointments.filter(a => 
+    a.patientName === patient?.name || a.pid === patient?.pid || a.pid === patient?.id || a.patientId === patient?.id
+  );
+  const patientRecords = (medicalRecords || []).filter(r => 
+    r.pid === patient?.id || r.pid === patient?.pid || r.patientName === patient?.name
+  );
 
   // Calculate Live Financial Stats
-  const patientInvoices = (allInvoices || []).filter(i => i.pid === patient?.id || i.patientName === patient?.name);
+  const patientInvoices = (allInvoices || []).filter(i => 
+    i.pid === patient?.id || i.pid === patient?.pid || i.patientId === patient?.id || i.patientName === patient?.name
+  );
   const totalBilled = patientInvoices.reduce((sum, inv) => sum + (Number(inv.totalAmount) || 0), 0);
-  const totalPaid = patientInvoices.filter(i => i.status === 'PAID').reduce((sum, inv) => sum + (Number(inv.totalAmount) || 0), 0);
+  const totalPaid = patientInvoices.reduce((sum, inv) => sum + (Number(inv.paidAmount) || 0), 0);
   const outstanding = totalBilled - totalPaid;
 
   if (!patient) {
