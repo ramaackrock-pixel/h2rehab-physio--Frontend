@@ -18,7 +18,8 @@ import {
   Pencil,
   Trash2,
   Plus,
-  X
+  X,
+  FileText
 } from 'lucide-react';
 import { useAppData } from '@/context/AppDataContext';
 
@@ -98,7 +99,7 @@ export function Staff() {
         </div>
 
         {/* Dynamic View */}
-        {activeTab === 'Payroll' && !(user?.role === 'admin' || user?.role === 'superadmin') ? (
+        {activeTab === 'Payroll' && user?.role !== 'superadmin' ? (
           <div className="bg-white p-12 rounded-3xl border border-slate-100 shadow-sm text-center">
             <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400">
               <Lock size={32} />
@@ -183,7 +184,8 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
               <th className="px-6 py-4">Role</th>
               <th className="px-6 py-4">Department</th>
               <th className="px-6 py-4">Branch</th>
-              <th className="px-6 py-4">Mobile</th>
+              <th className="px-6 py-4">Joining Date</th>
+              <th className="px-6 py-4">Aadhar Number</th>
               <th className="px-6 py-4">Status</th>
               <th className="px-6 py-4">Actions</th>
             </tr>
@@ -211,7 +213,8 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
                 </td>
                 <td className="px-6 py-5 text-sm text-slate-600 font-medium">{member.department}</td>
                 <td className="px-6 py-5 text-sm text-slate-600 font-medium">{member.branch}</td>
-                <td className="px-6 py-5 text-sm text-slate-600 font-medium">{member.mobile}</td>
+                <td className="px-6 py-5 text-sm text-slate-600 font-bold">{member.joiningDate || '-'}</td>
+                <td className="px-6 py-5 text-sm text-slate-500 font-medium tracking-wider">{member.aadharNumber || '-'}</td>
                 <td className="px-6 py-5">
                   <div className="flex items-center space-x-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${member.status === 'Active' ? 'bg-teal-500' : 'bg-slate-300'}`} />
@@ -219,6 +222,17 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
                       {member.status}
                     </span>
                   </div>
+                  {member.degreeCertificate && (
+                    <a 
+                      href={member.degreeCertificate} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-1 mt-1 text-[9px] font-black text-teal-600 hover:underline uppercase"
+                    >
+                      <FileText size={10} />
+                      <span>Certificate</span>
+                    </a>
+                  )}
                 </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end space-x-2">

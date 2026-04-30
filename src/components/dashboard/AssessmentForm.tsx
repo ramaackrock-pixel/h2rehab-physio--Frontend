@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { AnatomyMap } from './AnatomyMap';
-import { 
-  ChevronRight, 
-  ChevronLeft, 
-  Save, 
-  Activity, 
-  Target, 
-  User, 
-  Home, 
-  Accessibility, 
+import {
+  ChevronRight,
+  ChevronLeft,
+  Save,
+  Activity,
+  Target,
+  User,
+  Home,
+  Accessibility,
   Move,
   BookOpen,
   ClipboardList
@@ -47,7 +47,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
       friends: 'Present',
       culturalEnvironment: 'Supportive'
     },
-    
+
     // Step 2: History, Social Support & Goals
     history: {
       historyOfTrauma: '',
@@ -271,7 +271,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 ].map(field => (
                   <div key={field.id} className="space-y-2">
                     <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">{field.label}</label>
-                    <input 
+                    <input
                       type="text"
                       value={(formData.general as any)[field.id]}
                       onChange={(e) => handleUpdate('general', field.id, e.target.value)}
@@ -279,7 +279,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                     />
                   </div>
                 ))}
-                
+
                 {/* Selects */}
                 <div className="space-y-2">
                   <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Gender</label>
@@ -333,7 +333,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
             </div>
           </div>
         );
-      
+
       case 2:
         return (
           <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
@@ -356,7 +356,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 ].map(field => (
                   <div key={field.id} className="space-y-2">
                     <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">{field.label}</label>
-                    <textarea 
+                    <textarea
                       value={(formData.history as any)[field.id]}
                       onChange={(e) => handleUpdate('history', field.id, e.target.value)}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-[#5ab2b2]/10 outline-none"
@@ -397,7 +397,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                   ].map(field => (
                     <div key={field.id} className="space-y-2">
                       <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">{field.label}</label>
-                      <input 
+                      <input
                         type="text"
                         value={(formData.goals as any)[field.id]}
                         onChange={(e) => handleUpdate('goals', field.id, e.target.value)}
@@ -432,7 +432,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                     </select>
                   </div>
                 ))}
-                
+
                 <div className="space-y-2">
                   <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">Bowel / Bladder control</label>
                   <select value={formData.psychological.bowelControl} onChange={(e) => handleUpdate('psychological', 'bowelControl', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm outline-none">
@@ -450,7 +450,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 ].map(field => (
                   <div key={field.id} className="space-y-2">
                     <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">{field.label}</label>
-                    <input 
+                    <input
                       type="text"
                       value={(formData.psychological as any)[field.id]}
                       onChange={(e) => handleUpdate('psychological', field.id, e.target.value)}
@@ -467,9 +467,9 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
         return (
           <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
             {/* ANATOMY MAP IS PRESERVED HERE */}
-            <AnatomyMap 
-              selectedParts={formData.physical.painPoints} 
-              onChange={(parts) => handleUpdate('physical', 'painPoints', parts)} 
+            <AnatomyMap
+              selectedParts={formData.physical.painPoints}
+              onChange={(parts) => handleUpdate('physical', 'painPoints', parts)}
             />
 
             <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
@@ -477,7 +477,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 <Activity className="text-[#5ab2b2]" />
                 Physical Examination & Pain
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 {[
                   { id: 'swelling', label: 'Swelling' },
@@ -491,7 +491,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 ].map(field => (
                   <div key={field.id} className="space-y-1">
                     <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest">{field.label}</label>
-                    <input 
+                    <input
                       type="text"
                       value={(formData.physical as any)[field.id]}
                       onChange={(e) => handleUpdate('physical', field.id, e.target.value)}
@@ -511,7 +511,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="md:col-span-2 space-y-4">
                   <h4 className="text-sm font-bold text-slate-700">Pain Profile</h4>
                   <div className="grid grid-cols-2 gap-4">
@@ -522,7 +522,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase">Pain Scale (0-10)</label>
                       <select value={formData.physical.painScale} onChange={(e) => handleUpdate('physical', 'painScale', Number(e.target.value))} className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs outline-none font-bold text-[#5ab2b2]">
-                        {[0,1,2,3,4,5,6,7,8,9,10].map(v => <option key={v} value={v}>{v}</option>)}
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(v => <option key={v} value={v}>{v}</option>)}
                       </select>
                     </div>
                     <div>
@@ -548,7 +548,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 <Accessibility className="text-[#5ab2b2]" />
                 Range of Motion (ROM) & Muscle Tests
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-slate-700 uppercase tracking-widest">ROM - Upper Limb</h4>
@@ -576,7 +576,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase">Oxford Scale (0-5)</label>
                     <select value={formData.muscleTest.oxfordScale} onChange={(e) => handleUpdate('muscleTest', 'oxfordScale', e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm font-bold text-[#5ab2b2] outline-none">
-                      {[0,1,2,3,4,5].map(v => <option key={v} value={v.toString()}>{v}</option>)}
+                      {[0, 1, 2, 3, 4, 5].map(v => <option key={v} value={v.toString()}>{v}</option>)}
                     </select>
                   </div>
                   <div className="space-y-2">
@@ -611,7 +611,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 <Move className="text-[#5ab2b2]" />
                 Functional Evaluation & Limitations
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-slate-700 border-b border-slate-50 pb-2">Functional Eval</h4>
@@ -675,7 +675,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 <ClipboardList className="text-[#5ab2b2]" />
                 Conclusion, Referral & Treatment Plan
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div className="space-y-4">
                   <h4 className="text-sm font-bold text-slate-700 uppercase">Conclusion Remarks</h4>
@@ -729,7 +729,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
         <div className="flex space-x-2 w-full min-w-max">
           {steps.map((s, idx) => (
             <React.Fragment key={s.id}>
-              <div 
+              <div
                 className={`flex items-center space-x-2 px-4 py-3 rounded-2xl cursor-pointer transition-all duration-300 ${step === s.id ? 'bg-[#5ab2b2] text-white shadow-lg shadow-[#5ab2b2]/40' : step > s.id ? 'bg-teal-50 text-[#5ab2b2]' : 'bg-slate-50 text-slate-400 hover:bg-slate-100'}`}
                 onClick={() => setStep(s.id)}
               >
@@ -747,7 +747,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
 
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-5xl px-4 z-40">
         <div className="bg-white/90 backdrop-blur-md p-4 rounded-3xl border border-white/50 shadow-2xl flex items-center justify-between">
-          <button 
+          <button
             onClick={() => setStep(s => Math.max(1, s - 1))}
             disabled={step === 1}
             className={`flex items-center space-x-2 px-6 py-3 font-bold rounded-2xl transition-all ${step === 1 ? 'opacity-0 cursor-default' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95'}`}
@@ -759,7 +759,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
           <div className="flex items-center space-x-4">
             <button onClick={onCancel} className="px-6 py-3 text-slate-400 font-bold hover:text-slate-600 transition-colors">Discard</button>
             {step === 7 ? (
-              <button 
+              <button
                 onClick={() => onSave(formData)}
                 className="flex items-center space-x-3 px-10 py-3 bg-[#5ab2b2] text-white font-black rounded-2xl shadow-xl shadow-teal-500/30 hover:bg-[#439c9c] active:scale-95 transition-all uppercase tracking-widest text-xs"
               >
@@ -767,7 +767,7 @@ export function AssessmentForm({ onSave, onCancel }: AssessmentFormProps) {
                 <span>Finalize Assessment</span>
               </button>
             ) : (
-              <button 
+              <button
                 onClick={() => setStep(s => Math.min(7, s + 1))}
                 className="flex items-center space-x-3 px-10 py-3 bg-[#5ab2b2] text-white font-black rounded-2xl shadow-xl shadow-teal-500/30 hover:bg-[#439c9c] active:scale-95 transition-all uppercase tracking-widest text-xs"
               >

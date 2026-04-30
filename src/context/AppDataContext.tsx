@@ -206,22 +206,23 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   // Staff Actions
-  const addStaff = async (member: StaffMember) => {
+  const addStaff = async (member: any) => {
     try {
-      const prepared = apiService.prepareStaff(member);
-      const created = await staffService.create(prepared);
+      const data = member instanceof FormData ? member : apiService.prepareStaff(member);
+      const created = await staffService.create(data);
       const staffWithId = { ...created, id: created._id || created.id };
       setStaff(prev => [staffWithId, ...prev]);
     } catch (err) {
       console.error("Failed to add staff", err);
     }
   };
-  const updateStaff = async (member: StaffMember) => {
+  const updateStaff = async (member: any) => {
     try {
-      const prepared = apiService.prepareStaff(member);
-      const updated = await staffService.update(member.id, prepared);
+      const id = member instanceof FormData ? member.get('id') as string : member.id;
+      const data = member instanceof FormData ? member : apiService.prepareStaff(member);
+      const updated = await staffService.update(id, data);
       const staffWithId = { ...updated, id: updated._id || updated.id };
-      setStaff(prev => prev.map(s => s.id === member.id ? staffWithId : s));
+      setStaff(prev => prev.map(s => s.id === id ? staffWithId : s));
     } catch (err) {
       console.error("Failed to update staff", err);
     }

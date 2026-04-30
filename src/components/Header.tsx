@@ -1,6 +1,6 @@
 import { Search, HelpCircle, Menu } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSearch } from '../context/SearchContext';
 import { useAppData } from '../context/AppDataContext';
 
@@ -12,6 +12,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { searchQuery, setSearchQuery } = useSearch();
   const { patients } = useAppData();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionRef = useRef<HTMLDivElement>(null);
 
@@ -53,14 +54,13 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Menu size={20} />
         </button>
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-[#1a2b2b] p-0.5 border border-[#5ab2b2]/30 shadow-sm">
-            <img 
-              src="/h2f_logo.png" 
-              alt="H2F Logo" 
-              className="w-full h-full object-cover scale-110"
+          <div className="w-24 h-10 rounded-lg overflow-hidden bg-white/50 p-0.5 border border-[#5ab2b2]/30 shadow-sm">
+            <img
+              src="/h2f_log_cropped.jpeg"
+              alt="H2F Logo"
+              className="w-full h-full object-contain"
             />
           </div>
-          <span className="hidden sm:block text-lg font-bold text-slate-800 tracking-tight">H2F Rehab</span>
         </div>
       </div>
 

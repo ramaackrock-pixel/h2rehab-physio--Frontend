@@ -64,16 +64,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="p-6 flex flex-col items-center">
-          <div className="w-24 h-24 mb-3 rounded-full overflow-hidden shadow-md bg-[#1a2b2b] p-1 border-2 border-[#5ab2b2]/30">
+          <div className="w-48 h-20 mb-2 rounded-xl overflow-hidden shadow-sm bg-white/50 p-1 border border-[#5ab2b2]/10">
             <img
-              src="/h2f_logo.png"
-              alt="Health 2 Fit Rehab Zone"
-              className="w-full h-full object-cover scale-110"
+              src="/h2f_log_cropped.jpeg"
+              alt="H2F Logo"
+              className="w-full h-full object-contain"
             />
           </div>
-          <h1 className="text-xl font-bold text-slate-800 tracking-tight">H2F Rehab</h1>
-          <p className="text-[10px] font-semibold text-slate-500 tracking-widest uppercase">Get Back On Track</p>
-          <div className="mt-2 px-2 py-0.5 bg-[#5ab2b2]/20 rounded-full inline-block">
+          <div className="mt-1 px-2 py-0.5 bg-[#5ab2b2]/20 rounded-full inline-block">
             <p className="text-[10px] font-bold text-[#2e8b8b] uppercase">{user?.role}</p>
           </div>
         </div>

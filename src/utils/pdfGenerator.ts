@@ -85,20 +85,20 @@ export const generateAssessmentPDF = async (patient: any) => {
 
   // Logo Embedding
   try {
-    const logoResponse = await fetch('/h2f_logo.png');
+    const logoResponse = await fetch('/h2f_log_cropped.jpeg');
     const logoBytes = await logoResponse.arrayBuffer();
-    const logoImage = await pdfDoc.embedPng(logoBytes);
+    const logoImage = await pdfDoc.embedJpg(logoBytes);
     activePage.drawImage(logoImage, {
       x: margin,
       y: height - 60,
-      width: 40,
+      width: 100,
       height: 40,
     });
   } catch (e) {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  activePage.drawText('H2F REHAB CLINICAL ASSESSMENT', { x: margin + 50, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
+  activePage.drawText('CLINICAL ASSESSMENT REPORT', { x: margin + 110, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
   activePage.drawText(`Generated: ${dateStr} | ${timeStr}`, { 
     x: width - margin - 140, 
     y: height - 42, 
@@ -375,20 +375,20 @@ export const generateFinancialReport = async (invoices: any[], branches: any[]) 
 
   // Logo Embedding
   try {
-    const logoResponse = await fetch('/h2f_logo.png');
+    const logoResponse = await fetch('/h2f_log_cropped.jpeg');
     const logoBytes = await logoResponse.arrayBuffer();
-    const logoImage = await pdfDoc.embedPng(logoBytes);
+    const logoImage = await pdfDoc.embedJpg(logoBytes);
     page.drawImage(logoImage, {
       x: margin,
       y: height - 60,
-      width: 40,
+      width: 100,
       height: 40,
     });
   } catch (e) {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('H2F REHAB FINANCIAL PERFORMANCE AUDIT', { x: margin + 50, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
+  page.drawText('FINANCIAL PERFORMANCE AUDIT', { x: margin + 110, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
   page.drawText(`Generated: ${dateStr} | ${timeStr}`, { 
     x: width - margin - 140, 
     y: height - 42, 
@@ -478,20 +478,20 @@ export const generateInvoicePDF = async (invoice: any) => {
 
   // Logo Embedding
   try {
-    const logoResponse = await fetch('/h2f_logo.png');
+    const logoResponse = await fetch('/h2f_log_cropped.jpeg');
     const logoBytes = await logoResponse.arrayBuffer();
-    const logoImage = await pdfDoc.embedPng(logoBytes);
+    const logoImage = await pdfDoc.embedJpg(logoBytes);
     page.drawImage(logoImage, {
       x: margin,
       y: height - 60,
-      width: 40,
+      width: 100,
       height: 40,
     });
   } catch (e) {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('H2F REHAB CLINIC INVOICE', { x: margin + 50, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
+  page.drawText('CLINIC INVOICE', { x: margin + 110, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
   page.drawText(`INVOICE: ${invoice.id?.substring(0, 8).toUpperCase()}`, { 
     x: width - margin - 140, 
     y: height - 42, 
@@ -561,20 +561,20 @@ export const generatePayrollPDF = async (staff: any, monthStr: string) => {
 
   // Logo Embedding
   try {
-    const logoResponse = await fetch('/h2f_logo.png');
+    const logoResponse = await fetch('/h2f_log_cropped.jpeg');
     const logoBytes = await logoResponse.arrayBuffer();
-    const logoImage = await pdfDoc.embedPng(logoBytes);
+    const logoImage = await pdfDoc.embedJpg(logoBytes);
     page.drawImage(logoImage, {
       x: margin,
       y: height - 60,
-      width: 40,
+      width: 100,
       height: 40,
     });
   } catch (e) {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('H2F REHAB PAYROLL PAYSLIP', { x: margin + 50, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
+  page.drawText('PAYROLL PAYSLIP', { x: margin + 110, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
   page.drawText(`PAYSLIP: ${staff.id?.substring(0, 8).toUpperCase()}`, { 
     x: width - margin - 140, 
     y: height - 42, 

@@ -14,6 +14,9 @@ export interface StaffMember {
   mobile: string;
   status: StaffStatus;
   avatar: string;
+  joiningDate?: string;
+  aadharNumber?: string;
+  degreeCertificate?: string;
   scheduleDays?: string[];
   shift?: string;
   workingHours?: string;
