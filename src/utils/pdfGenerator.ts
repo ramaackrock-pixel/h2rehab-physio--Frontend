@@ -98,7 +98,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  activePage.drawText('CLINICAL ASSESSMENT REPORT', { x: margin + 110, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
+  activePage.drawText('CLINICAL ASSESSMENT REPORT', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
   activePage.drawText(`Generated: ${dateStr} | ${timeStr}`, { 
     x: width - margin - 140, 
     y: height - 42, 
@@ -106,7 +106,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     font: timesBoldFont, 
     color: rgb(0.8, 0.8, 0.8) 
   });
-  activePage.drawText('Physiotherapy & Rehabilitation Center', { x: margin + 50, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
+  activePage.drawText('Physiotherapy & Rehabilitation Center', { x: margin + 120, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
 
   const data = patient.assessmentData || {};
 
@@ -388,7 +388,7 @@ export const generateFinancialReport = async (invoices: any[], branches: any[]) 
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('FINANCIAL PERFORMANCE AUDIT', { x: margin + 110, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
+  page.drawText('FINANCIAL PERFORMANCE AUDIT', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
   page.drawText(`Generated: ${dateStr} | ${timeStr}`, { 
     x: width - margin - 140, 
     y: height - 42, 
@@ -396,7 +396,7 @@ export const generateFinancialReport = async (invoices: any[], branches: any[]) 
     font: timesBoldFont, 
     color: rgb(0.8, 0.8, 0.8) 
   });
-  page.drawText('Executive Revenue & Tax Summary Report', { x: margin + 50, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
+  page.drawText('Executive Revenue & Tax Summary Report', { x: margin + 120, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
 
   const drawSection = (title: string, y: number) => {
     page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 22, color: rgb(0.35, 0.7, 0.7) });
@@ -491,7 +491,7 @@ export const generateInvoicePDF = async (invoice: any) => {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('CLINIC INVOICE', { x: margin + 110, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
+  page.drawText('CLINIC INVOICE', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
   page.drawText(`INVOICE: ${invoice.id?.substring(0, 8).toUpperCase()}`, { 
     x: width - margin - 140, 
     y: height - 42, 
@@ -499,7 +499,7 @@ export const generateInvoicePDF = async (invoice: any) => {
     font: timesBoldFont, 
     color: rgb(0.8, 0.8, 0.8) 
   });
-  page.drawText('Billing & Payment Receipt', { x: margin + 50, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
+  page.drawText('Billing & Payment Receipt', { x: margin + 120, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
 
   const drawSection = (title: string, y: number) => {
     page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 22, color: rgb(0.35, 0.7, 0.7) });
@@ -574,7 +574,7 @@ export const generatePayrollPDF = async (staff: any, monthStr: string) => {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('PAYROLL PAYSLIP', { x: margin + 110, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
+  page.drawText('PAYROLL PAYSLIP', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
   page.drawText(`PAYSLIP: ${staff.id?.substring(0, 8).toUpperCase()}`, { 
     x: width - margin - 140, 
     y: height - 42, 
@@ -582,7 +582,7 @@ export const generatePayrollPDF = async (staff: any, monthStr: string) => {
     font: timesBoldFont, 
     color: rgb(0.8, 0.8, 0.8) 
   });
-  page.drawText('Confidential Salary Information', { x: margin + 50, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
+  page.drawText('Confidential Salary Information', { x: margin + 120, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
 
   const drawSection = (title: string, y: number) => {
     page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 22, color: rgb(0.35, 0.7, 0.7) });
