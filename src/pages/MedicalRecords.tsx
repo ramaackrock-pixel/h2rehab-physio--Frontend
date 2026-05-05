@@ -92,6 +92,37 @@ export function MedicalRecords() {
     setActiveMenuId(null);
   };
 
+  const handleDownload = async (record: MedicalRecord) => {
+    if (!record.fileUrl) {
+      // If no fileUrl, try to generate PDF if it's a patient report
+      const patientData = patients.find(p => p.id === record.pid || p.name === record.patientName);
+      if (patientData) {
+        generateAssessmentPDF(patientData);
+      } else {
+        alert("No document found to download.");
+      }
+      setActiveMenuId(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(record.fileUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = record.fileName || 'download';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Download error:", error);
+      window.open(record.fileUrl, '_blank');
+    }
+    setActiveMenuId(null);
+  };
+
   const getRecordTypeStyle = (type: MedicalRecordType) => {
     switch (type) {
       case 'X-RAY': return 'bg-blue-50 text-blue-600 border-blue-100';
@@ -269,7 +300,10 @@ export function MedicalRecords() {
                           <Eye size={14} />
                           <span>View Detail</span>
                         </button>
-                        <button className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-[#dcf4f4] hover:text-[#2e8b8b] flex items-center space-x-2 transition-colors">
+                        <button 
+                          onClick={() => handleDownload(record)}
+                          className="w-full text-left px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-[#dcf4f4] hover:text-[#2e8b8b] flex items-center space-x-2 transition-colors"
+                        >
                           <Download size={14} />
                           <span>Download</span>
                         </button>
