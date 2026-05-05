@@ -31,6 +31,7 @@ export function MedicalRecords() {
   const [searchTerm, setSearchTerm] = useState('');
   const [recordTypeFilter, setRecordTypeFilter] = useState<string>('All Status');
   const [branchFilter, setBranchFilter] = useState<string>('All Branches');
+  const [dateFilter, setDateFilter] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [viewingRecord, setViewingRecord] = useState<MedicalRecord | null>(null);
@@ -46,9 +47,19 @@ export function MedicalRecords() {
       const matchesSearch = patientMatch || pidMatch;
       const matchesType = recordTypeFilter === 'All Status' || record.recordType === recordTypeFilter;
       const matchesBranch = branchFilter === 'All Branches' || record.branch === branchFilter;
-      return matchesSearch && matchesType && matchesBranch;
+      
+      const matchesDate = !dateFilter || (() => {
+        const recordDate = new Date(record.uploadedDate);
+        if (isNaN(recordDate.getTime())) return false;
+        const filterDate = new Date(dateFilter);
+        return recordDate.getFullYear() === filterDate.getFullYear() &&
+               recordDate.getMonth() === filterDate.getMonth() &&
+               recordDate.getDate() === filterDate.getDate();
+      })();
+
+      return matchesSearch && matchesType && matchesBranch && matchesDate;
     });
-  }, [medicalRecords, searchTerm, searchQuery, recordTypeFilter, branchFilter]);
+  }, [medicalRecords, searchTerm, searchQuery, recordTypeFilter, branchFilter, dateFilter, patients]);
 
   const totalPages = Math.ceil(filteredRecords.length / ITEMS_PER_PAGE) || 1;
   const paginatedRecords = filteredRecords.slice(
@@ -60,6 +71,7 @@ export function MedicalRecords() {
     setSearchTerm('');
     setRecordTypeFilter('All Status');
     setBranchFilter('All Branches');
+    setDateFilter('');
     setCurrentPage(1);
   };
 
@@ -140,8 +152,9 @@ export function MedicalRecords() {
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <input 
-              type="text"
-              placeholder="mm/dd/yyyy"
+              type="date"
+              value={dateFilter}
+              onChange={(e) => { setDateFilter(e.target.value); setCurrentPage(1); }}
               className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-lg pl-9 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#5ab2b2]"
             />
           </div>

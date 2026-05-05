@@ -38,6 +38,7 @@ export function Billing() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'All'>('All');
   const [branchFilter, setBranchFilter] = useState('All Branches');
+  const [timeFilter, setTimeFilter] = useState('All Time');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -80,7 +81,22 @@ export function Billing() {
     const invoiceBranch = invoice.branch || patient?.branch;
     const matchesBranch = branchFilter === 'All Branches' || invoiceBranch === branchFilter;
     
-    return matchesSearch && matchesStatus && matchesBranch;
+    const invoiceDate = new Date(invoice.date || invoice.createdAt || new Date());
+    const now = new Date();
+    let matchesTime = true;
+
+    if (timeFilter === 'Last 7 Days') {
+      const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+      matchesTime = invoiceDate >= sevenDaysAgo;
+    } else if (timeFilter === 'Last 30 Days') {
+      const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+      matchesTime = invoiceDate >= thirtyDaysAgo;
+    } else if (timeFilter === 'Last 3 Months') {
+      const threeMonthsAgo = new Date(now.getTime() - (90 * 24 * 60 * 60 * 1000));
+      matchesTime = invoiceDate >= threeMonthsAgo;
+    }
+    
+    return matchesSearch && matchesStatus && matchesBranch && matchesTime;
   });
 
   const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE) || 1;
@@ -230,10 +246,15 @@ export function Billing() {
                 <div className="relative w-full md:w-44 group">
                   <div className="relative">
                     <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <select className="w-full appearance-none bg-white border border-slate-200 rounded-xl pl-11 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#5ab2b2] cursor-pointer transition-all">
-                      <option>Last 30 Days</option>
-                      <option>Last 7 Days</option>
-                      <option>Last 3 Months</option>
+                    <select 
+                      value={timeFilter}
+                      onChange={(e) => { setTimeFilter(e.target.value); setCurrentPage(1); }}
+                      className="w-full appearance-none bg-white border border-slate-200 rounded-xl pl-11 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#5ab2b2] cursor-pointer transition-all"
+                    >
+                      <option value="All Time">All Time</option>
+                      <option value="Last 7 Days">Last 7 Days</option>
+                      <option value="Last 30 Days">Last 30 Days</option>
+                      <option value="Last 3 Months">Last 3 Months</option>
                     </select>
                     <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   </div>

@@ -307,6 +307,7 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
 function AttendanceView() {
   const { staff: allStaff, updateStaff, branches } = useAppData();
   const [branchFilter, setBranchFilter] = useState('All');
+  const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
   const todayStr = new Date().toISOString().split('T')[0];
@@ -396,9 +397,12 @@ function AttendanceView() {
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
           <div className="relative w-full sm:w-56 group">
             <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <div className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700">
-              {todayStr}
-            </div>
+            <input 
+              type="date"
+              value={dateFilter}
+              onChange={(e) => { setDateFilter(e.target.value); setCurrentPage(1); }}
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            />
           </div>
           <div className="relative w-full sm:w-64 group">
             <div className="relative">
@@ -433,8 +437,8 @@ function AttendanceView() {
           </thead>
           <tbody className="divide-y divide-slate-50">
             {paginatedStaff.map((member) => {
-              const todayLog = (member.attendanceLogs || []).find((l: any) => l.date === todayStr);
-              const status = todayLog ? todayLog.status : 'not checked in yet';
+              const dayLog = (member.attendanceLogs || []).find((l: any) => l.date === dateFilter);
+              const status = dayLog ? dayLog.status : 'not checked in yet';
 
               return (
                 <tr key={member.id} className="hover:bg-slate-50/50 transition-all font-medium">
@@ -447,7 +451,7 @@ function AttendanceView() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-sm text-slate-500 font-bold">{todayStr}</td>
+                  <td className="px-6 py-5 text-sm text-slate-500 font-bold">{dateFilter}</td>
                   <td className="px-6 py-5">
                     <div className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold ${getStatusBadge(status)}`}>
                       <div className={`w-1.5 h-1.5 rounded-full ${status === 'presented today' ? 'bg-teal-500' :
@@ -456,30 +460,36 @@ function AttendanceView() {
                       <span>{status}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-sm font-bold text-slate-700">
-                    {todayLog?.checkInTime || '-'} {todayLog?.checkOutTime ? ` / ${todayLog.checkOutTime}` : ''}
-                  </td>
-                  <td className="px-6 py-5 text-sm text-slate-400 font-medium">
-                    <div className="flex items-center gap-2">
-                      {!todayLog && (
-                        <button onClick={() => handleCheckIn(member)} className="px-3 py-1 bg-teal-50 text-teal-600 rounded text-xs font-bold hover:bg-teal-100">
-                          Check In
-                        </button>
-                      )}
-                      {todayLog && !todayLog.checkOutTime && (
-                        <button onClick={() => handleCheckOut(member)} className="px-3 py-1 bg-blue-50 text-blue-600 rounded text-xs font-bold hover:bg-blue-100">
-                          Check Out
-                        </button>
-                      )}
-                      {todayLog?.location && <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 truncate max-w-[100px] inline-block">{todayLog.location}</span>}
-                    </div>
-                  </td>
+                  <td className="px-6 py-5 text-slate-500 text-sm font-bold">{dayLog ? dayLog.checkInTime : '--'}</td>
+                  <td className="px-6 py-5 text-slate-500 text-[10px] font-bold uppercase truncate max-w-[150px]" title={dayLog?.location}>{dayLog ? (dayLog.location || '--') : '--'}</td>
                   <td className="px-6 py-5">
-                    {todayLog && (
-                      <button onClick={() => handleDeleteLog(member)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
-                        <Trash2 size={16} />
-                      </button>
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {dateFilter === todayStr && (
+                        <>
+                          {(!dayLog || dayLog.status === 'checked in') && (
+                            <button
+                              onClick={() => dayLog?.status === 'checked in' ? handleCheckOut(member) : handleCheckIn(member)}
+                              className={`p-2 rounded-lg transition-all ${dayLog?.status === 'checked in'
+                                ? 'bg-orange-50 text-orange-500 hover:bg-orange-500 hover:text-white shadow-sm'
+                                : 'bg-teal-50 text-teal-600 hover:bg-teal-600 hover:text-white shadow-sm'
+                                }`}
+                              title={dayLog?.status === 'checked in' ? 'Check Out' : 'Check In'}
+                            >
+                              {dayLog?.status === 'checked in' ? <Clock size={16} /> : <Activity size={16} />}
+                            </button>
+                          )}
+                          {dayLog && (
+                            <button
+                              onClick={() => handleDeleteLog(member)}
+                              className="p-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-all shadow-sm"
+                              title="Remove Log"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );

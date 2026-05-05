@@ -22,41 +22,29 @@ export function StatCards({ branch, timeRange }: { branch: string, timeRange?: s
     {
       title: 'Total Patients',
       value: patients.length,
-      change: '+12.5%',
-      trend: 'up',
       iconName: 'Users',
       iconBg: 'bg-[#e0f4f4]',
-      trendBg: 'bg-emerald-50 text-emerald-600',
       hidden: false
     },
     {
       title: 'Total Appointments',
       value: appointments.length,
-      change: '+4.3%',
-      trend: 'up',
       iconName: 'Calendar',
       iconBg: 'bg-[#e0f4f4]',
-      trendBg: 'bg-emerald-50 text-emerald-600',
       hidden: false
     },
     {
       title: 'Active Invoices',
       value: activeInvoicesCount,
-      change: '-2.1%',
-      trend: 'down',
       iconName: 'Banknote',
       iconBg: 'bg-[#e0f4f4]',
-      trendBg: 'bg-red-50 text-red-600',
       hidden: isStaff
     },
     {
        title: 'Clinic Staff',
        value: staff.length,
-       change: '0%',
-       trend: '',
        iconName: 'BriefcaseMedical',
        iconBg: 'bg-[#e0f4f4]',
-       trendBg: 'bg-slate-50 text-slate-500',
        hidden: false
     }
   ].filter(s => !s.hidden);
@@ -82,9 +70,6 @@ export function StatCards({ branch, timeRange }: { branch: string, timeRange?: s
           <div className="flex justify-between items-start mb-4">
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.iconBg}`}>
               {getIcon(stat.iconName)}
-            </div>
-            <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${stat.trendBg}`}>
-              {stat.change} {stat.trend === 'up' ? '↗' : stat.trend === 'down' ? '↘' : ''}
             </div>
           </div>
           <div>

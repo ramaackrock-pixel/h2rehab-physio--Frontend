@@ -13,6 +13,8 @@ export interface Invoice {
   dueAmount: number;
   status: InvoiceStatus;
   branch?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface BillingStat {

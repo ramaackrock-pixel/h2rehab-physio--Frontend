@@ -117,9 +117,12 @@ export default function StaffModal({ isOpen, onClose, onSave, staff }: StaffModa
       return;
     }
 
-    // Create FormData for file upload
     const data = new FormData();
     Object.keys(formData).forEach(key => {
+      if (['attendanceLogs', 'payrollLogs', 'createdAt', 'updatedAt', '__v', '_id'].includes(key)) {
+        return;
+      }
+
       if (key === 'scheduleDays') {
         formData.scheduleDays.forEach((day: string) => data.append('scheduleDays[]', day));
       } else if (key === 'degreeCertificate') {
@@ -132,6 +135,10 @@ export default function StaffModal({ isOpen, onClose, onSave, staff }: StaffModa
         data.append(key, formData[key]);
       }
     });
+
+    if (staff && !data.has('id')) {
+      data.append('id', staff.id || staff._id);
+    }
 
     onSave(data);
   };
@@ -268,26 +275,29 @@ export default function StaffModal({ isOpen, onClose, onSave, staff }: StaffModa
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Degree Certificate</label>
                 <div 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-xl hover:border-teal-400 hover:bg-teal-50/30 transition-all cursor-pointer group"
+                  onClick={() => !staff && fileInputRef.current?.click()}
+                  className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-xl transition-all group ${staff ? 'cursor-not-allowed opacity-60 bg-slate-50' : 'hover:border-teal-400 hover:bg-teal-50/30 cursor-pointer'}`}
                 >
                   <div className="space-y-1 text-center">
-                    <Upload className="mx-auto h-10 w-10 text-slate-300 group-hover:text-teal-500 transition-colors" />
-                    <div className="flex text-sm text-slate-600">
-                      <span className="relative rounded-md font-bold text-teal-600 hover:text-teal-700">
+                    <Upload className={`mx-auto h-10 w-10 ${staff ? 'text-slate-300' : 'text-slate-300 group-hover:text-teal-500'} transition-colors`} />
+                    <div className="flex text-sm text-slate-600 justify-center">
+                      <span className={`relative rounded-md font-bold ${staff ? 'text-slate-500' : 'text-teal-600 hover:text-teal-700'}`}>
                         {formData.degreeCertificate instanceof File ? formData.degreeCertificate.name : 
                          formData.degreeCertificate ? 'Certificate Uploaded' : 'Upload certificate'}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400">PDF, PNG, JPG up to 5MB</p>
+                    {!staff && <p className="text-xs text-slate-400">PDF, PNG, JPG up to 5MB</p>}
+                    {staff && <p className="text-[10px] text-slate-400 font-bold mt-2 uppercase">Cannot be modified after creation</p>}
                   </div>
-                  <input 
-                    ref={fileInputRef}
-                    type="file" 
-                    className="hidden" 
-                    onChange={handleFileChange}
-                    accept=".pdf,image/*"
-                  />
+                  {!staff && (
+                    <input 
+                      ref={fileInputRef}
+                      type="file" 
+                      className="hidden" 
+                      onChange={handleFileChange}
+                      accept=".pdf,image/*"
+                    />
+                  )}
                 </div>
                 {formData.degreeCertificate && typeof formData.degreeCertificate === 'string' && (
                    <a href={formData.degreeCertificate} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-1 mt-2 text-[10px] font-bold text-teal-600 hover:underline">

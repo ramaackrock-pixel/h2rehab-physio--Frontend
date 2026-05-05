@@ -16,7 +16,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionRef = useRef<HTMLDivElement>(null);
 
-  const filteredPatients = patients.filter(p => 
+  const filteredPatients = patients.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (p.pid && p.pid.toLowerCase().includes(searchQuery.toLowerCase())) ||
     p.id.toLowerCase().includes(searchQuery.toLowerCase())
@@ -47,7 +47,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   return (
     <header className="flex items-center justify-between h-16 px-4 md:px-8 bg-white border-b border-slate-200 print:hidden">
       <div className="flex items-center space-x-4 mr-4">
-        <button 
+        <button
           onClick={onMenuClick}
           className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden"
         >
@@ -69,7 +69,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
             type="text"
-            placeholder="Search patients, records or staff..."
+            placeholder="Search patients..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -79,7 +79,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             onKeyDown={handleKeyDown}
             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5ab2b2] focus:border-transparent text-sm"
           />
-          
+
           {showSuggestions && searchQuery && filteredPatients.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="p-2 border-b border-slate-50">
