@@ -10,7 +10,7 @@ interface RecordModalProps {
 }
 
 export default function RecordModal({ isOpen, onClose, onSave }: RecordModalProps) {
-  const { patients, doctors } = useAppData();
+  const { patients, doctors, branches } = useAppData();
   const [formData, setFormData] = useState<any>({
     patientName: '',
     pid: '',
@@ -18,7 +18,8 @@ export default function RecordModal({ isOpen, onClose, onSave }: RecordModalProp
     fileName: '',
     fileObj: null,
     doctor: '',
-    uploadedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    uploadedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    branch: ''
   });
 
   useEffect(() => {
@@ -30,7 +31,8 @@ export default function RecordModal({ isOpen, onClose, onSave }: RecordModalProp
         fileName: '',
         fileObj: null,
         doctor: doctors[0]?.name || '',
-        uploadedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        uploadedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        branch: ''
       });
     }
   }, [isOpen, doctors]);
@@ -41,9 +43,9 @@ export default function RecordModal({ isOpen, onClose, onSave }: RecordModalProp
     const patientName = e.target.value;
     const patient = patients.find(p => p.name === patientName);
     if (patient) {
-      setFormData((prev: any) => ({ ...prev, patientName, pid: patient.id }));
+      setFormData((prev: any) => ({ ...prev, patientName, pid: patient.pid || patient.id, branch: patient.branch }));
     } else {
-      setFormData((prev: any) => ({ ...prev, patientName }));
+      setFormData((prev: any) => ({ ...prev, patientName, branch: '' }));
     }
   };
 
@@ -54,6 +56,11 @@ export default function RecordModal({ isOpen, onClose, onSave }: RecordModalProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.fileObj) {
+      alert("Please select a file to upload.");
+      return;
+    }
+    
     if (formData.fileObj) {
       const data = new FormData();
       data.append('patientName', formData.patientName);
@@ -61,6 +68,9 @@ export default function RecordModal({ isOpen, onClose, onSave }: RecordModalProp
       data.append('recordType', formData.recordType);
       data.append('doctor', formData.doctor);
       data.append('uploadedDate', formData.uploadedDate);
+      if (formData.branch) {
+        data.append('branch', formData.branch);
+      }
       data.append('file', formData.fileObj);
       onSave(data);
     } else {
@@ -99,7 +109,7 @@ export default function RecordModal({ isOpen, onClose, onSave }: RecordModalProp
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Record Type</label>
                 <select
@@ -126,6 +136,21 @@ export default function RecordModal({ isOpen, onClose, onSave }: RecordModalProp
                   <option value="">Select Doctor</option>
                   {doctors.map(doc => (
                     <option key={doc.id} value={doc.name}>{doc.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Branch</label>
+                <select
+                  name="branch"
+                  value={formData.branch}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
+                  required
+                >
+                  <option value="">Select Branch</option>
+                  {branches.map(b => (
+                    <option key={b.id} value={b.name}>{b.name}</option>
                   ))}
                 </select>
               </div>

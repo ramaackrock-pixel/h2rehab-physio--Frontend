@@ -15,9 +15,7 @@ export const medicalRecordService = {
   create: async (recordData: FormData | any) => {
     let response;
     if (recordData instanceof FormData) {
-      response = await apiClient.post('/records', recordData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      response = await apiClient.post('/records', recordData);
       return response.data.data;
     } else {
       response = await apiService.post('/records', recordData);

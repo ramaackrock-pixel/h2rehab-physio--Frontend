@@ -27,7 +27,7 @@ const ITEMS_PER_PAGE = 5;
 
 export function MedicalRecords() {
   const { searchQuery } = useSearch();
-  const { medicalRecords, addMedicalRecord, deleteMedicalRecord, branches } = useAppData();
+  const { medicalRecords, addMedicalRecord, deleteMedicalRecord, branches, patients } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
   const [recordTypeFilter, setRecordTypeFilter] = useState<string>('All Status');
   const [branchFilter, setBranchFilter] = useState<string>('All Branches');
@@ -39,13 +39,16 @@ export function MedicalRecords() {
   const filteredRecords = useMemo(() => {
     return medicalRecords.filter(record => {
       const activeSearch = searchTerm || searchQuery;
+      const patient = patients.find(p => p.id === record.pid || p.name === record.patientName);
+      const displayPid = patient?.pid || record.pid;
       const patientMatch = record.patientName ? record.patientName.toLowerCase().includes(activeSearch.toLowerCase()) : false;
-      const pidMatch = record.pid ? record.pid.toLowerCase().includes(activeSearch.toLowerCase()) : false;
+      const pidMatch = displayPid ? displayPid.toLowerCase().includes(activeSearch.toLowerCase()) : false;
       const matchesSearch = patientMatch || pidMatch;
       const matchesType = recordTypeFilter === 'All Status' || record.recordType === recordTypeFilter;
-      return matchesSearch && matchesType;
+      const matchesBranch = branchFilter === 'All Branches' || record.branch === branchFilter;
+      return matchesSearch && matchesType && matchesBranch;
     });
-  }, [medicalRecords, searchTerm, searchQuery, recordTypeFilter]);
+  }, [medicalRecords, searchTerm, searchQuery, recordTypeFilter, branchFilter]);
 
   const totalPages = Math.ceil(filteredRecords.length / ITEMS_PER_PAGE) || 1;
   const paginatedRecords = filteredRecords.slice(
@@ -149,7 +152,7 @@ export function MedicalRecords() {
               onChange={(e) => setBranchFilter(e.target.value)}
               className="w-full appearance-none bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#5ab2b2]"
             >
-              <option value="All Branches">Branch</option>
+              <option value="All Branches">All Branches</option>
               {branches.map(b => (
                 <option key={b.id} value={b.name}>{b.name}</option>
               ))}
@@ -181,6 +184,7 @@ export function MedicalRecords() {
                 <th className="px-6 py-4 font-bold">File Name</th>
                 <th className="px-6 py-4 font-bold">Uploaded Date</th>
                 <th className="px-6 py-4 font-bold">Doctor / Therapist</th>
+                <th className="px-6 py-4 font-bold">Branch</th>
                 <th className="px-6 py-4 font-bold text-center">Actions</th>
               </tr>
             </thead>
@@ -195,7 +199,9 @@ export function MedicalRecords() {
                       <div className="font-bold text-slate-800">{record.patientName}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-slate-500 font-medium">{record.pid}</td>
+                  <td className="px-6 py-4 text-slate-500 font-medium">
+                    {patients.find(p => p.id === record.pid || p.name === record.patientName)?.pid || record.pid}
+                  </td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wide ${getRecordTypeStyle(record.recordType)}`}>
                       {record.recordType}
@@ -228,6 +234,11 @@ export function MedicalRecords() {
                   </td>
                   <td className="px-6 py-4 text-slate-500 font-medium">{record.uploadedDate}</td>
                   <td className="px-6 py-4 text-slate-700 font-bold">{record.doctor}</td>
+                  <td className="px-6 py-4 text-slate-700 font-medium">
+                    <span className="px-2 py-1 rounded bg-slate-100 text-slate-600 text-[10px] font-bold tracking-wide">
+                      {record.branch || 'N/A'}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 text-center relative">
                     <button 
                       onClick={() => setActiveMenuId(activeMenuId === record.id ? null : record.id)}
@@ -263,7 +274,7 @@ export function MedicalRecords() {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-400 italic">
+                  <td colSpan={8} className="px-6 py-12 text-center text-slate-400 italic">
                     No medical records found
                   </td>
                 </tr>
@@ -333,7 +344,9 @@ export function MedicalRecords() {
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${getRecordTypeStyle(viewingRecord.recordType)}`}>
                       {viewingRecord.recordType}
                     </span>
-                    <span className="text-slate-500 text-xs font-medium">{viewingRecord.pid}</span>
+                    <span className="text-slate-500 text-xs font-medium">
+                      {patients.find(p => p.id === viewingRecord.pid || p.name === viewingRecord.patientName)?.pid || viewingRecord.pid}
+                    </span>
                   </div>
                 </div>
               </div>

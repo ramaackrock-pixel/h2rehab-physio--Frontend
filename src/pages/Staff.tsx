@@ -119,14 +119,21 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
   const { searchQuery } = useSearch();
   const { staff: allStaff, branches } = useAppData();
   const [localSearch, setLocalSearch] = useState('');
+  const [branchFilter, setBranchFilter] = useState('Branch: All');
+  const [statusFilter, setStatusFilter] = useState('Status: All');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
   const staff = allStaff.filter(s => {
     const activeSearch = localSearch || searchQuery;
-    return s.name.toLowerCase().includes(activeSearch.toLowerCase()) ||
+    const matchesSearch = s.name.toLowerCase().includes(activeSearch.toLowerCase()) ||
       s.email.toLowerCase().includes(activeSearch.toLowerCase()) ||
       s.id.toLowerCase().includes(activeSearch.toLowerCase());
+    
+    const matchesBranch = branchFilter === 'Branch: All' || s.branch === branchFilter;
+    const matchesStatus = statusFilter === 'Status: All' || s.status === statusFilter;
+    
+    return matchesSearch && matchesBranch && matchesStatus;
   });
 
   const totalPages = Math.ceil(staff.length / ITEMS_PER_PAGE) || 1;
@@ -152,8 +159,12 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
             <div className="relative w-full sm:w-44 group">
-              <select className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none cursor-pointer pr-10">
-                <option>Branch: All</option>
+              <select 
+                value={branchFilter}
+                onChange={(e) => { setBranchFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none cursor-pointer pr-10"
+              >
+                <option value="Branch: All">Branch: All</option>
                 {branches.map(b => (
                   <option key={b.id} value={b.name}>{b.name}</option>
                 ))}
@@ -161,16 +172,23 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
               <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
             <div className="relative w-full sm:w-44 group">
-              <select className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none cursor-pointer pr-10">
-                <option>Status: All</option>
-                <option>Active</option>
-                <option>Inactive</option>
+              <select 
+                value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none cursor-pointer pr-10"
+              >
+                <option value="Status: All">Status: All</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
               </select>
               <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
         </div>
-        <button className="text-teal-600 text-[10px] font-bold uppercase tracking-widest hover:text-teal-700 font-bold flex items-center space-x-2 mt-2 lg:mt-0">
+        <button 
+          onClick={() => { setLocalSearch(''); setBranchFilter('Branch: All'); setStatusFilter('Status: All'); setCurrentPage(1); }}
+          className="text-teal-600 text-[10px] font-bold uppercase tracking-widest hover:text-teal-700 font-bold flex items-center space-x-2 mt-2 lg:mt-0"
+        >
           <Filter size={14} />
           <span>Clear Filters</span>
         </button>

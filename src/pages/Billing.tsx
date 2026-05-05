@@ -30,13 +30,14 @@ const ITEMS_PER_PAGE = 5;
 
 export function Billing() {
   const { searchQuery } = useSearch();
-  const { invoices: invoicesData, addInvoice, updateInvoice, branches } = useAppData();
+  const { invoices: invoicesData, addInvoice, updateInvoice, branches, patients } = useAppData();
   const { user } = useAuth();
   const isStaff = user?.role === 'staff';
 
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'All'>('All');
+  const [branchFilter, setBranchFilter] = useState('All Branches');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -74,7 +75,12 @@ export function Billing() {
       patientName.toLowerCase().includes(activeSearch.toLowerCase()) ||
       invoice.id.toLowerCase().includes(activeSearch.toLowerCase());
     const matchesStatus = statusFilter === 'All' || invoice.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    
+    const patient = patients.find(p => p.id === invoice.patientId || p.id === invoice.pid || p.name === invoice.patientName);
+    const invoiceBranch = invoice.branch || patient?.branch;
+    const matchesBranch = branchFilter === 'All Branches' || invoiceBranch === branchFilter;
+    
+    return matchesSearch && matchesStatus && matchesBranch;
   });
 
   const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE) || 1;
@@ -234,8 +240,12 @@ export function Billing() {
                 </div>
 
                 <div className="relative w-full md:w-44 group">
-                  <select className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#5ab2b2] pr-10 cursor-pointer transition-all">
-                    <option>All Branches</option>
+                  <select 
+                    className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#5ab2b2] pr-10 cursor-pointer transition-all"
+                    value={branchFilter}
+                    onChange={(e) => { setBranchFilter(e.target.value); setCurrentPage(1); }}
+                  >
+                    <option value="All Branches">All Branches</option>
                     {branches.map(b => (
                       <option key={b.id} value={b.name}>{b.name}</option>
                     ))}
@@ -246,7 +256,7 @@ export function Billing() {
             </div>
 
             <button
-              onClick={() => { setSearchTerm(''); setStatusFilter('All'); setCurrentPage(1); }}
+              onClick={() => { setSearchTerm(''); setStatusFilter('All'); setBranchFilter('All Branches'); setCurrentPage(1); }}
               className="text-teal-600 text-sm font-bold hover:text-teal-700 transition-colors whitespace-nowrap px-2"
             >
               Clear Filters

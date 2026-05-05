@@ -23,7 +23,7 @@ export const generateAssessmentPDF = async (patient: any) => {
   const drawRow = (label: string, value: string, y: number, isSubHeader = false) => {
     const rowHeight = 25;
     const col1Width = 180;
-    
+
     // Page Break Logic
     if (y < 80) {
       activePage = pdfDoc.addPage([595, 842]);
@@ -33,25 +33,25 @@ export const generateAssessmentPDF = async (patient: any) => {
     }
 
     // Row Backgrounds
-    activePage.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: rowHeight, color: isSubHeader ? rgb(0.92, 0.95, 0.95) : rgb(1,1,1) });
+    activePage.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: rowHeight, color: isSubHeader ? rgb(0.92, 0.95, 0.95) : rgb(1, 1, 1) });
     activePage.drawRectangle({ x: margin, y: y - 5, width: col1Width, height: rowHeight, color: rgb(0.97, 0.98, 0.99) });
-    
+
     // Grid Lines (Vertical)
     const lineYStart = y - 5;
     const lineYEnd = y + 20;
     activePage.drawLine({ start: { x: margin, y: lineYStart }, end: { x: margin, y: lineYEnd }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) });
     activePage.drawLine({ start: { x: margin + col1Width, y: lineYStart }, end: { x: margin + col1Width, y: lineYEnd }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) });
     activePage.drawLine({ start: { x: width - margin, y: lineYStart }, end: { x: width - margin, y: lineYEnd }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) });
-    
+
     // Grid Line (Horizontal Bottom)
     activePage.drawLine({ start: { x: margin, y: lineYStart }, end: { x: width - margin, y: lineYStart }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) });
 
     // Cell Text
     activePage.drawText((label || '').toUpperCase(), { x: margin + 10, y: y + 5, size: 7.5, font: timesBoldFont, color: rgb(0.2, 0.3, 0.3) });
-    
+
     const cleanValue = String(value || 'N/A');
     activePage.drawText(cleanValue.substring(0, 75), { x: margin + col1Width + 10, y: y + 5, size: 9, font: timesRomanFont, color: rgb(0.1, 0.1, 0.1) });
-    
+
     return y - rowHeight;
   };
 
@@ -62,11 +62,11 @@ export const generateAssessmentPDF = async (patient: any) => {
       y = 800;
     }
     activePage.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 22, color: rgb(0.35, 0.7, 0.7) });
-    activePage.drawText(title, { x: margin + 10, y: y, size: 10, font: timesBoldFont, color: rgb(1,1,1) });
-    
+    activePage.drawText(title, { x: margin + 10, y: y, size: 10, font: timesBoldFont, color: rgb(1, 1, 1) });
+
     // Initial border for the first row under this header
     activePage.drawLine({ start: { x: margin, y: y - 5 }, end: { x: width - margin, y: y - 5 }, thickness: 0.5, color: rgb(0.7, 0.7, 0.7) });
-    
+
     return y - 27;
   };
 
@@ -98,13 +98,13 @@ export const generateAssessmentPDF = async (patient: any) => {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  activePage.drawText('CLINICAL ASSESSMENT REPORT', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
-  activePage.drawText(`Generated: ${dateStr} | ${timeStr}`, { 
-    x: width - margin - 140, 
-    y: height - 42, 
-    size: 7, 
-    font: timesBoldFont, 
-    color: rgb(0.8, 0.8, 0.8) 
+  activePage.drawText('CLINICAL ASSESSMENT REPORT', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1, 1, 1) });
+  activePage.drawText(`Generated: ${dateStr} | ${timeStr}`, {
+    x: width - margin - 140,
+    y: height - 42,
+    size: 7,
+    font: timesBoldFont,
+    color: rgb(0.8, 0.8, 0.8)
   });
   activePage.drawText('Physiotherapy & Rehabilitation Center', { x: margin + 120, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
 
@@ -113,7 +113,7 @@ export const generateAssessmentPDF = async (patient: any) => {
   // --- PELVIC FLOOR ASSESSMENT BRANCH ---
   if (patient.assessmentType === 'PELVIC_FLOOR') {
     activePage.drawText('PELVIC FLOOR REHABILITATION REPORT', { x: margin, y: currentY + 40, size: 12, font: timesBoldFont, color: rgb(0.2, 0.3, 0.3) });
-    
+
     // Administrative
     currentY = drawSectionHeader('ADMINISTRATIVE DETAILS', currentY);
     currentY = drawRow('Full Name', patient.name, currentY);
@@ -132,7 +132,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Location', sub.location, currentY);
     currentY = drawRow('Aggravating Factor', sub.aggravatingFactor, currentY);
     currentY = drawRow('Easing Factor', sub.easingFactor, currentY);
-    
+
     // Red Flags
     currentY = drawRow('--- RED FLAGS ---', '', currentY, true);
     const rf = data.redFlags || {};
@@ -161,7 +161,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Lumbar / Hip ROM', `${obj.musculoskeletal?.lumbarRom || 'N/A'} / ${obj.musculoskeletal?.hipRom || 'N/A'}`, currentY);
     currentY = drawRow('Core / Abdom Active', `${obj.musculoskeletal?.coreStrength || 'N/A'} / ${obj.musculoskeletal?.abdominalActivation || 'N/A'}`, currentY);
     currentY = drawRow('Diastasis / Pudendal', `${obj.musculoskeletal?.diastasisRecti || 'N/A'} / ${obj.neurological?.pudendalNerve || 'N/A'}`, currentY);
-    
+
     // Examination
     currentY = drawRow('--- PELVIC EXAMINATION ---', '', currentY, true);
     const exam = data.examination || {};
@@ -179,11 +179,11 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Goal / Intervention', `${diag.goal || 'N/A'} / ${diag.intervention || 'N/A'}`, currentY);
     currentY = drawRow('Home Exercise / Freq', `${diag.homeExercise || 'N/A'} / ${diag.frequency || 'N/A'}`, currentY);
     currentY = drawRow('Follow Ups', diag.followUps, currentY);
-  } 
+  }
   // --- GENERAL PHYSIOTHERAPY BRANCH ---
   else {
     activePage.drawText('GENERAL PHYSIOTHERAPY ASSESSMENT', { x: margin, y: currentY + 40, size: 12, font: timesBoldFont, color: rgb(0.2, 0.3, 0.3) });
-    
+
     // 1. GENERAL & LIVING
     currentY = drawSectionHeader('1. ADMINISTRATIVE & DEMOGRAPHIC DETAILS', currentY);
     const gen = data.general || {};
@@ -196,7 +196,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Diagnosis', gen.diagnosis, currentY);
     currentY = drawRow('Civil Status / Children', `${gen.civilStatus || 'N/A'} / ${gen.children || 'N/A'}`, currentY);
     currentY = drawRow('Occupation / Education', `${gen.occupation || 'N/A'} / ${gen.educationLevel || 'N/A'}`, currentY);
-    
+
     currentY = drawRow('--- LIVING CONDITIONS ---', '', currentY, true);
     const liv = data.living || {};
     currentY = drawRow('House Condition', liv.houseCondition, currentY);
@@ -212,7 +212,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Medical History / Hosp.', `${hist.medicalHistory || 'N/A'} / ${hist.hospital || 'N/A'}`, currentY);
     currentY = drawRow('Medication', hist.medication, currentY);
     currentY = drawRow('X-Ray / Exams', hist.xrayOrExams, currentY);
-    
+
     currentY = drawRow('--- GOALS & EXPECTATIONS ---', '', currentY, true);
     const goal = data.goals || {};
     currentY = drawRow('Main Concerns', goal.mainConcerns, currentY);
@@ -237,11 +237,11 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Swelling / Temp.', `${phys.swelling || 'N/A'} / ${phys.temperature || 'N/A'}`, currentY);
     currentY = drawRow('Sensation / Reflexes', `${phys.sensation || 'N/A'} / ${phys.reflexes || 'N/A'}`, currentY);
     currentY = drawRow('Numbness / Paresthesia', `${phys.numbness || 'N/A'} / ${phys.paresthesia || 'N/A'}`, currentY);
-    
+
     currentY = drawRow('--- NEURODYNAMIC TESTS ---', '', currentY, true);
     currentY = drawRow('SLR / Slump', `${phys.slr || 'N/A'} / ${phys.slump || 'N/A'}`, currentY);
     currentY = drawRow('PKB / ULNT', `${phys.pkb || 'N/A'} / ${phys.ulnt || 'N/A'}`, currentY);
-    
+
     currentY = drawRow('--- PAIN ASSESSMENT ---', '', currentY, true);
     currentY = drawRow('Pain Level (VAS)', `${phys.painScale || 0} / 10`, currentY);
     currentY = drawRow('Pain Category', phys.painCategory, currentY);
@@ -251,7 +251,7 @@ export const generateAssessmentPDF = async (patient: any) => {
 
     // --- DRAW 2D ANATOMY SVG ---
     const painPoints = Array.isArray(phys.painPoints) ? phys.painPoints : [];
-    
+
     // Check for page break before drawing large SVG
     if (currentY < 180) {
       activePage = pdfDoc.addPage([595, 842]);
@@ -262,14 +262,14 @@ export const generateAssessmentPDF = async (patient: any) => {
     // PDF coordinate system is bottom-left origin. For drawSvgPath, it usually aligns differently, but we'll try to center it.
     // drawSvgPath starts at x,y. But we must invert Y if we want it right side up or rely on scale.
     // The SVGs are 0..24 width and 0..40 height.
-    const mapY = currentY - 140; 
-    
+    const mapY = currentY - 140;
+
     activePage.drawText('FRONT VIEW', { x: margin + 30, y: currentY - 10, size: 8, font: timesBoldFont, color: rgb(0.4, 0.4, 0.4) });
     // drawSvgPath respects coordinates where smaller Y is lower. BUT SVG paths generally have Y going down.
     // pdf-lib's drawSvgPath correctly parses it but might be upside down if not careful. 
     // Wait, drawSvgPath handles it, but Y=0 is bottom in PDF, so drawing it at mapY will draw it upwards or downwards depending on implementation.
     // It usually draws with Y going down starting from the y point you provide.
-    
+
     activePage.drawSvgPath(BODY_SILHOUETTE_PATH, { x: margin + 40, y: currentY - 20, scale: svgScale, color: rgb(0.94, 0.96, 0.98), borderColor: rgb(0.8, 0.83, 0.88), borderWidth: 0.5 });
     FRONT_PARTS.forEach(part => {
       const isSelected = painPoints.includes(part.id);
@@ -302,7 +302,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Wrist / Fingers ROM', `${rom.wrist || 'N/A'} / ${rom.fingers || 'N/A'}`, currentY);
     currentY = drawRow('Hip / Knee ROM', `${rom.hip || 'N/A'} / ${rom.knee || 'N/A'}`, currentY);
     currentY = drawRow('Neck / Trunk ROM', `${rom.neckMovements || 'N/A'} / ${rom.trunkMovements || 'N/A'}`, currentY);
-    
+
     currentY = drawRow('--- MUSCLE TEST & TONE ---', '', currentY, true);
     const mus = data.muscleTest || {};
     const tone = data.muscleTone || {};
@@ -317,7 +317,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Balance / Coordination', `${funcEv.balance || 'N/A'} / ${funcEv.coordination || 'N/A'}`, currentY);
     currentY = drawRow('Gait Quality / Safety', `${funcEv.gaitQuality || 'N/A'} / ${funcEv.safety || 'N/A'}`, currentY);
     currentY = drawRow('Cadence / Speed', `${funcEv.cadence || 'N/A'} / ${funcEv.speed || 'N/A'}`, currentY);
-    
+
     currentY = drawRow('--- ACTIVITIES & ASSISTANCE ---', '', currentY, true);
     const act = data.activity || {};
     currentY = drawRow('Assistive Devices', Array.isArray(act.assistiveDevices) ? act.assistiveDevices.join(', ') : (act.assistiveDevices || 'None'), currentY);
@@ -331,7 +331,7 @@ export const generateAssessmentPDF = async (patient: any) => {
     currentY = drawRow('Environmental / Personal', `${conc.environmentalFactors || 'N/A'} / ${conc.personalConditions || 'N/A'}`, currentY);
     currentY = drawRow('Clinical Remarks', conc.remarks, currentY);
     currentY = drawRow('Activity Limitations', conc.activityLimitations, currentY);
-    
+
     currentY = drawRow('--- PROPOSED PLAN ---', '', currentY, true);
     const planObj = data.plan || {};
     currentY = drawRow('Short-Term Goals', planObj.shortTermGoals, currentY);
@@ -388,25 +388,25 @@ export const generateFinancialReport = async (invoices: any[], branches: any[]) 
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('FINANCIAL PERFORMANCE AUDIT', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
-  page.drawText(`Generated: ${dateStr} | ${timeStr}`, { 
-    x: width - margin - 140, 
-    y: height - 42, 
-    size: 7, 
-    font: timesBoldFont, 
-    color: rgb(0.8, 0.8, 0.8) 
+  page.drawText('FINANCIAL PERFORMANCE AUDIT', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1, 1, 1) });
+  page.drawText(`Generated: ${dateStr} | ${timeStr}`, {
+    x: width - margin - 140,
+    y: height - 42,
+    size: 7,
+    font: timesBoldFont,
+    color: rgb(0.8, 0.8, 0.8)
   });
   page.drawText('Executive Revenue & Tax Summary Report', { x: margin + 120, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
 
   const drawSection = (title: string, y: number) => {
     page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 22, color: rgb(0.35, 0.7, 0.7) });
-    page.drawText(title, { x: margin + 10, y: y, size: 10, font: timesBoldFont, color: rgb(1,1,1) });
+    page.drawText(title, { x: margin + 10, y: y, size: 10, font: timesBoldFont, color: rgb(1, 1, 1) });
     return y - 30;
   };
 
   const drawRow = (label: string, value: string, y: number, isTotal = false) => {
     const colWidth = 250;
-    page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 25, color: isTotal ? rgb(0.95, 0.98, 0.98) : rgb(1,1,1) });
+    page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 25, color: isTotal ? rgb(0.95, 0.98, 0.98) : rgb(1, 1, 1) });
     page.drawText(label.toUpperCase(), { x: margin + 10, y: y + 5, size: 8, font: timesBoldFont, color: rgb(0.3, 0.4, 0.4) });
     page.drawText(value || 'N/A', { x: margin + colWidth, y: y + 5, size: 10, font: isTotal ? timesBoldFont : timesRomanFont, color: rgb(0.1, 0.1, 0.1) });
     page.drawLine({ start: { x: margin, y: y - 5 }, end: { x: width - margin, y: y - 5 }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) });
@@ -433,7 +433,7 @@ export const generateFinancialReport = async (invoices: any[], branches: any[]) 
     const branchInvoices = invoices.filter(inv => inv.branch === branch.name);
     const branchRev = branchInvoices.reduce((sum, inv) => sum + (inv.paidAmount || 0), 0);
     const branchDue = branchInvoices.reduce((sum, inv) => sum + (inv.dueAmount || 0), 0);
-    
+
     currentY = drawRow(branch.name, `Rev: INR ${branchRev.toLocaleString('en-IN')} | Due: INR ${branchDue.toLocaleString('en-IN')}`, currentY);
   });
 
@@ -472,7 +472,7 @@ export const generateInvoicePDF = async (invoice: any) => {
 
   // Header
   page.drawRectangle({ x: 0, y: height - 80, width: width, height: 80, color: rgb(0.1, 0.2, 0.2) });
-  
+
   const dateObj = new Date(invoice.date || new Date());
   const dateStr = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
 
@@ -491,25 +491,25 @@ export const generateInvoicePDF = async (invoice: any) => {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('CLINIC INVOICE', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
-  page.drawText(`INVOICE: ${invoice.id?.substring(0, 8).toUpperCase()}`, { 
-    x: width - margin - 140, 
-    y: height - 42, 
-    size: 9, 
-    font: timesBoldFont, 
-    color: rgb(0.8, 0.8, 0.8) 
+  page.drawText('CLINIC INVOICE', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1, 1, 1) });
+  page.drawText(`INVOICE: ${invoice.id?.substring(0, 8).toUpperCase()}`, {
+    x: width - margin - 140,
+    y: height - 42,
+    size: 9,
+    font: timesBoldFont,
+    color: rgb(0.8, 0.8, 0.8)
   });
   page.drawText('Billing & Payment Receipt', { x: margin + 120, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
 
   const drawSection = (title: string, y: number) => {
     page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 22, color: rgb(0.35, 0.7, 0.7) });
-    page.drawText(title, { x: margin + 10, y: y, size: 10, font: timesBoldFont, color: rgb(1,1,1) });
+    page.drawText(title, { x: margin + 10, y: y, size: 10, font: timesBoldFont, color: rgb(1, 1, 1) });
     return y - 30;
   };
 
   const drawRow = (label: string, value: string, y: number, isTotal = false) => {
     const colWidth = 250;
-    page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 25, color: isTotal ? rgb(0.95, 0.98, 0.98) : rgb(1,1,1) });
+    page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 25, color: isTotal ? rgb(0.95, 0.98, 0.98) : rgb(1, 1, 1) });
     page.drawText(label.toUpperCase(), { x: margin + 10, y: y + 5, size: 8, font: timesBoldFont, color: rgb(0.3, 0.4, 0.4) });
     page.drawText(value || 'N/A', { x: margin + colWidth, y: y + 5, size: 10, font: isTotal ? timesBoldFont : timesRomanFont, color: rgb(0.1, 0.1, 0.1) });
     page.drawLine({ start: { x: margin, y: y - 5 }, end: { x: width - margin, y: y - 5 }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) });
@@ -555,7 +555,7 @@ export const generatePayrollPDF = async (staff: any, monthStr: string) => {
 
   // Header
   page.drawRectangle({ x: 0, y: height - 80, width: width, height: 80, color: rgb(0.1, 0.2, 0.2) });
-  
+
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
 
@@ -574,25 +574,25 @@ export const generatePayrollPDF = async (staff: any, monthStr: string) => {
     console.warn("Logo not found, proceeding without logo branding.");
   }
 
-  page.drawText('PAYROLL PAYSLIP', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1,1,1) });
-  page.drawText(`PAYSLIP: ${staff.id?.substring(0, 8).toUpperCase()}`, { 
-    x: width - margin - 140, 
-    y: height - 42, 
-    size: 9, 
-    font: timesBoldFont, 
-    color: rgb(0.8, 0.8, 0.8) 
+  page.drawText('PAYROLL PAYSLIP', { x: margin + 120, y: height - 42, size: 14, font: timesBoldFont, color: rgb(1, 1, 1) });
+  page.drawText(`PAYSLIP: ${staff.id?.substring(0, 8).toUpperCase()}`, {
+    x: width - margin - 140,
+    y: height - 42,
+    size: 9,
+    font: timesBoldFont,
+    color: rgb(0.8, 0.8, 0.8)
   });
   page.drawText('Confidential Salary Information', { x: margin + 120, y: height - 56, size: 8, font: timesRomanFont, color: rgb(0.6, 0.6, 0.6) });
 
   const drawSection = (title: string, y: number) => {
     page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 22, color: rgb(0.35, 0.7, 0.7) });
-    page.drawText(title, { x: margin + 10, y: y, size: 10, font: timesBoldFont, color: rgb(1,1,1) });
+    page.drawText(title, { x: margin + 10, y: y, size: 10, font: timesBoldFont, color: rgb(1, 1, 1) });
     return y - 30;
   };
 
   const drawRow = (label: string, value: string, y: number, isTotal = false) => {
     const colWidth = 250;
-    page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 25, color: isTotal ? rgb(0.95, 0.98, 0.98) : rgb(1,1,1) });
+    page.drawRectangle({ x: margin, y: y - 5, width: width - (margin * 2), height: 25, color: isTotal ? rgb(0.95, 0.98, 0.98) : rgb(1, 1, 1) });
     page.drawText(label.toUpperCase(), { x: margin + 10, y: y + 5, size: 8, font: timesBoldFont, color: rgb(0.3, 0.4, 0.4) });
     page.drawText(value || '0', { x: margin + colWidth, y: y + 5, size: 10, font: isTotal ? timesBoldFont : timesRomanFont, color: rgb(0.1, 0.1, 0.1) });
     page.drawLine({ start: { x: margin, y: y - 5 }, end: { x: width - margin, y: y - 5 }, thickness: 0.5, color: rgb(0.8, 0.8, 0.8) });
