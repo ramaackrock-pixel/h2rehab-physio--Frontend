@@ -4,6 +4,7 @@ export interface Invoice {
   id: string;
   patientName: string;
   pid?: string;
+  patientId?: string;
   initials: string;
   initialsBg: string; // Tailwind class, e.g., 'bg-teal-100 text-teal-700'
   date: string;
@@ -11,6 +12,9 @@ export interface Invoice {
   paidAmount: number;
   dueAmount: number;
   status: InvoiceStatus;
+  branch?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface BillingStat {

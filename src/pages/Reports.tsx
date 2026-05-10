@@ -28,13 +28,13 @@ import {
   Building,
   CheckCircle2
 } from 'lucide-react';
-import { TREATMENT_POPULARITY } from '../data/reports';
+
 import { useAppData } from '@/context/AppDataContext';
 import { useAuth } from '@/context/AuthContext';
 import { reportService } from '@/services/reportService';
 
 export function Reports() {
-  const { branches } = useAppData(); // We still need global branches list
+  const { branches, patients: globalPatients, invoices: globalInvoices } = useAppData();
   const { user } = useAuth();
   
   const isSuperAdmin = user?.role === 'superadmin';
@@ -68,27 +68,33 @@ export function Reports() {
     window.print();
   };
 
-  // Dynamic KPI Cards
+  // Dynamic KPI Cards - Always use global (total) data
   const kpiMetrics = useMemo(() => {
-    const totalCollected = invoices.reduce((sum, inv) => sum + (inv.paidAmount || 0), 0);
-    const totalTarget = invoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
-    const activePatients = patients.filter(p => p.status === 'ACTIVE').length;
+    const savedTarget = localStorage.getItem('globalGoalTarget');
+    const globalTarget = savedTarget ? parseInt(savedTarget, 10) : 1000000;
+    const totalCollected = globalInvoices.reduce((sum, inv) => sum + (inv.paidAmount || 0), 0);
+    const activePatients = globalPatients.filter(p => p.status === 'ACTIVE').length;
 
     return [
       { label: 'Total Collected', value: `₹${totalCollected.toLocaleString('en-IN')}`, trend: 12.5, suffix: '', icon: Wallet },
-      { label: 'Total Target', value: `₹${totalTarget.toLocaleString('en-IN')}`, trend: 8.4, suffix: '', icon: Activity },
+      { label: 'Total Target', value: `₹${globalTarget.toLocaleString('en-IN')}`, trend: 8.4, suffix: '', icon: Activity },
       { label: 'Active Patients', value: activePatients, trend: 5.2, suffix: '', icon: Users },
       { label: 'Total Branches', value: branches.length, trend: 0, suffix: '', icon: Building }
     ];
-  }, [patients, invoices, branches]);
+  }, [globalPatients, globalInvoices, branches]);
 
   // Dynamic Collection vs Target (Area Chart)
   const collectionTrends = useMemo(() => {
     const monthlyData: Record<string, { collected: number; target: number }> = {};
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
+    // Get target from localStorage (same as CollectionStatus.tsx)
+    const savedTarget = localStorage.getItem('globalGoalTarget');
+    const globalTarget = savedTarget ? parseInt(savedTarget, 10) : 1000000;
+    const monthlyTarget = globalTarget / 12; // Average monthly target
+
     // Initialize months
-    months.forEach(m => monthlyData[m] = { collected: 0, target: 0 });
+    months.forEach(m => monthlyData[m] = { collected: 0, target: monthlyTarget });
 
     invoices.forEach(inv => {
       if (inv.date) {
@@ -112,7 +118,7 @@ export function Reports() {
     return displayMonths.map(m => ({
       month: m,
       collected: monthlyData[m].collected,
-      target: monthlyData[m].target || monthlyData[m].collected * 1.2 // fallback target
+      target: monthlyData[m].target
     }));
   }, [invoices]);
 
@@ -216,29 +222,24 @@ export function Reports() {
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto print:hidden">
             
-            {/* Role-based Time Filter Dropdown */}
-            <div className="relative w-full sm:w-auto">
-              <select
-                value={timeFilter}
-                onChange={(e) => setTimeFilter(e.target.value)}
-                disabled={!isSuperAdmin}
-                className="appearance-none bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer w-full h-full disabled:bg-slate-50 disabled:text-slate-400"
-              >
-                {isSuperAdmin ? (
-                  <>
-                    <option value="1Y">1 Year</option>
-                    <option value="6M">6 Months</option>
-                    <option value="3M">3 Months</option>
-                    <option value="TODAY">Today</option>
-                  </>
-                ) : (
-                  <option value="TODAY">Today's Report</option>
-                )}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
-                <ChevronDown size={16} />
+            {/* Role-based Time Filter Dropdown - Only visible to superadmin */}
+            {isSuperAdmin && (
+              <div className="relative w-full sm:w-auto">
+                <select
+                  value={timeFilter}
+                  onChange={(e) => setTimeFilter(e.target.value)}
+                  className="appearance-none bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer w-full h-full"
+                >
+                  <option value="1Y">1 Year</option>
+                  <option value="6M">6 Months</option>
+                  <option value="3M">3 Months</option>
+                  <option value="TODAY">Today</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                  <ChevronDown size={16} />
+                </div>
               </div>
-            </div>
+            )}
 
             <button 
               onClick={handleExportReport}

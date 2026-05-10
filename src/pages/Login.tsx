@@ -29,15 +29,13 @@ export function Login() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="w-28 h-28 mx-auto mb-4 rounded-full overflow-hidden shadow-2xl bg-[#1a2b2b] p-1 border-4 border-white">
-          <img 
-            src="/h2f_logo.png" 
-            alt="Health 2 Fit Rehab Zone" 
-            className="w-full h-full object-cover scale-110"
-          />
-        </div>
-        <h1 className="text-4xl font-bold text-slate-800 tracking-tight">H2F Rehab</h1>
-        <p className="text-xs font-semibold text-slate-500 tracking-widest mt-2 uppercase">Get Back On Track</p>
+          <div className="w-48 h-20 bg-white/50 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-[#5ab2b2]/20 overflow-hidden p-2 mx-auto">
+            <img 
+              src="/h2f_log_cropped.jpeg" 
+              alt="H2F Logo"
+              className="w-full h-full object-contain"
+            />
+          </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

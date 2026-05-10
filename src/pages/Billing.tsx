@@ -30,13 +30,15 @@ const ITEMS_PER_PAGE = 5;
 
 export function Billing() {
   const { searchQuery } = useSearch();
-  const { invoices: invoicesData, addInvoice, updateInvoice, branches } = useAppData();
+  const { invoices: invoicesData, addInvoice, updateInvoice, branches, patients } = useAppData();
   const { user } = useAuth();
   const isStaff = user?.role === 'staff';
 
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'All'>('All');
+  const [branchFilter, setBranchFilter] = useState('All Branches');
+  const [timeFilter, setTimeFilter] = useState('All Time');
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -74,7 +76,27 @@ export function Billing() {
       patientName.toLowerCase().includes(activeSearch.toLowerCase()) ||
       invoice.id.toLowerCase().includes(activeSearch.toLowerCase());
     const matchesStatus = statusFilter === 'All' || invoice.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    
+    const patient = patients.find(p => p.id === invoice.patientId || p.id === invoice.pid || p.name === invoice.patientName);
+    const invoiceBranch = invoice.branch || patient?.branch;
+    const matchesBranch = branchFilter === 'All Branches' || invoiceBranch === branchFilter;
+    
+    const invoiceDate = new Date(invoice.date || invoice.createdAt || new Date());
+    const now = new Date();
+    let matchesTime = true;
+
+    if (timeFilter === 'Last 7 Days') {
+      const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+      matchesTime = invoiceDate >= sevenDaysAgo;
+    } else if (timeFilter === 'Last 30 Days') {
+      const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+      matchesTime = invoiceDate >= thirtyDaysAgo;
+    } else if (timeFilter === 'Last 3 Months') {
+      const threeMonthsAgo = new Date(now.getTime() - (90 * 24 * 60 * 60 * 1000));
+      matchesTime = invoiceDate >= threeMonthsAgo;
+    }
+    
+    return matchesSearch && matchesStatus && matchesBranch && matchesTime;
   });
 
   const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE) || 1;
@@ -224,18 +246,27 @@ export function Billing() {
                 <div className="relative w-full md:w-44 group">
                   <div className="relative">
                     <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <select className="w-full appearance-none bg-white border border-slate-200 rounded-xl pl-11 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#5ab2b2] cursor-pointer transition-all">
-                      <option>Last 30 Days</option>
-                      <option>Last 7 Days</option>
-                      <option>Last 3 Months</option>
+                    <select 
+                      value={timeFilter}
+                      onChange={(e) => { setTimeFilter(e.target.value); setCurrentPage(1); }}
+                      className="w-full appearance-none bg-white border border-slate-200 rounded-xl pl-11 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#5ab2b2] cursor-pointer transition-all"
+                    >
+                      <option value="All Time">All Time</option>
+                      <option value="Last 7 Days">Last 7 Days</option>
+                      <option value="Last 30 Days">Last 30 Days</option>
+                      <option value="Last 3 Months">Last 3 Months</option>
                     </select>
                     <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                   </div>
                 </div>
 
                 <div className="relative w-full md:w-44 group">
-                  <select className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#5ab2b2] pr-10 cursor-pointer transition-all">
-                    <option>All Branches</option>
+                  <select 
+                    className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#5ab2b2] pr-10 cursor-pointer transition-all"
+                    value={branchFilter}
+                    onChange={(e) => { setBranchFilter(e.target.value); setCurrentPage(1); }}
+                  >
+                    <option value="All Branches">All Branches</option>
                     {branches.map(b => (
                       <option key={b.id} value={b.name}>{b.name}</option>
                     ))}
@@ -246,7 +277,7 @@ export function Billing() {
             </div>
 
             <button
-              onClick={() => { setSearchTerm(''); setStatusFilter('All'); setCurrentPage(1); }}
+              onClick={() => { setSearchTerm(''); setStatusFilter('All'); setBranchFilter('All Branches'); setCurrentPage(1); }}
               className="text-teal-600 text-sm font-bold hover:text-teal-700 transition-colors whitespace-nowrap px-2"
             >
               Clear Filters

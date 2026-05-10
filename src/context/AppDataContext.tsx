@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CLINIC_BRANCHES as INITIAL_BRANCHES } from '@/data/branches';
+
 import { apiService } from '@/services/apiService';
 import { patientService } from '@/services/patientService';
 import { appointmentService } from '@/services/appointmentService';
@@ -90,7 +90,7 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [branches, setBranches] = useState<ClinicBranch[]>(INITIAL_BRANCHES);
+  const [branches, setBranches] = useState<ClinicBranch[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [settings, setSettings] = useState<AppSettings>(INITIAL_SETTINGS);
 
@@ -114,7 +114,15 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setPatients((patientsData || []).map((p: any) => apiService.preparePatient({ ...p, id: p._id })));
         setAppointments((appointmentsData || []).map((a: any) => apiService.prepareAppointment({ ...a, id: a._id || a.id })));
         setStaff((staffData || []).map((s: any) => ({ ...s, id: s._id || s.id })));
-        setInvoices((invoicesData || []).map((i: any) => ({ ...i, id: i._id || i.id })));
+        setInvoices((invoicesData || []).map((i: any) => {
+          const patient = (patientsData || []).find((p: any) => p._id === i.patientId);
+          return { 
+            ...i, 
+            id: i._id || i.id,
+            pid: i.patientId,
+            patientPid: patient?.pid || 'N/A'
+          };
+        }));
         const medicalRecordsWithInitials = (recordsData || []).map((r: any) => ({
           ...r,
           id: r._id || r.id,
@@ -123,8 +131,7 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }));
         setMedicalRecords(medicalRecordsWithInitials);
 
-        // If no branches in DB, keep INITIAL_BRANCHES
-        if (branchesData && branchesData.length > 0) {
+        if (branchesData) {
           setBranches(branchesData.map((b: any) => apiService.prepareBranch(b)));
         }
 
@@ -203,22 +210,23 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   // Staff Actions
-  const addStaff = async (member: StaffMember) => {
+  const addStaff = async (member: any) => {
     try {
-      const prepared = apiService.prepareStaff(member);
-      const created = await staffService.create(prepared);
+      const data = member instanceof FormData ? member : apiService.prepareStaff(member);
+      const created = await staffService.create(data);
       const staffWithId = { ...created, id: created._id || created.id };
       setStaff(prev => [staffWithId, ...prev]);
     } catch (err) {
       console.error("Failed to add staff", err);
     }
   };
-  const updateStaff = async (member: StaffMember) => {
+  const updateStaff = async (member: any) => {
     try {
-      const prepared = apiService.prepareStaff(member);
-      const updated = await staffService.update(member.id, prepared);
+      const id = member instanceof FormData ? member.get('id') as string : member.id;
+      const data = member instanceof FormData ? member : apiService.prepareStaff(member);
+      const updated = await staffService.update(id, data);
       const staffWithId = { ...updated, id: updated._id || updated.id };
-      setStaff(prev => prev.map(s => s.id === member.id ? staffWithId : s));
+      setStaff(prev => prev.map(s => s.id === id ? staffWithId : s));
     } catch (err) {
       console.error("Failed to update staff", err);
     }
@@ -264,7 +272,11 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const addInvoice = async (invoice: Invoice) => {
     try {
       const created = await billingService.create(invoice);
-      const invoiceWithId = { ...created, id: created._id || created.id };
+      const invoiceWithId = { 
+        ...created, 
+        id: created._id || created.id,
+        pid: created.patientId 
+      };
       setInvoices(prev => [invoiceWithId, ...prev]);
     } catch (err) {
       console.error("Failed to add invoice", err);
@@ -273,7 +285,11 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateInvoice = async (invoice: Invoice) => {
     try {
       const updated = await billingService.update(invoice.id, invoice);
-      const invoiceWithId = { ...updated, id: updated._id || updated.id };
+      const invoiceWithId = { 
+        ...updated, 
+        id: updated._id || updated.id,
+        pid: updated.patientId 
+      };
       setInvoices(prev => prev.map(i => i.id === invoice.id ? invoiceWithId : i));
     } catch (err) {
       console.error("Failed to update invoice", err);

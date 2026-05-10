@@ -1,6 +1,6 @@
 import { Search, HelpCircle, Menu } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSearch } from '../context/SearchContext';
 import { useAppData } from '../context/AppDataContext';
 
@@ -12,11 +12,13 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { searchQuery, setSearchQuery } = useSearch();
   const { patients } = useAppData();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionRef = useRef<HTMLDivElement>(null);
 
-  const filteredPatients = patients.filter(p => 
+  const filteredPatients = patients.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.pid && p.pid.toLowerCase().includes(searchQuery.toLowerCase())) ||
     p.id.toLowerCase().includes(searchQuery.toLowerCase())
   ).slice(0, 5);
 
@@ -45,21 +47,20 @@ export function Header({ onMenuClick }: HeaderProps) {
   return (
     <header className="flex items-center justify-between h-16 px-4 md:px-8 bg-white border-b border-slate-200 print:hidden">
       <div className="flex items-center space-x-4 mr-4">
-        <button 
+        <button
           onClick={onMenuClick}
           className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden"
         >
           <Menu size={20} />
         </button>
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-[#1a2b2b] p-0.5 border border-[#5ab2b2]/30 shadow-sm">
-            <img 
-              src="/h2f_logo.png" 
-              alt="H2F Logo" 
-              className="w-full h-full object-cover scale-110"
+          <div className="w-24 h-10 rounded-lg overflow-hidden bg-white/50 p-0.5 border border-[#5ab2b2]/30 shadow-sm">
+            <img
+              src="/h2f_log_cropped.jpeg"
+              alt="H2F Logo"
+              className="w-full h-full object-contain"
             />
           </div>
-          <span className="hidden sm:block text-lg font-bold text-slate-800 tracking-tight">H2F Rehab</span>
         </div>
       </div>
 
@@ -68,7 +69,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
             type="text"
-            placeholder="Search patients, records or staff..."
+            placeholder="Search patients..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -78,7 +79,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             onKeyDown={handleKeyDown}
             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5ab2b2] focus:border-transparent text-sm"
           />
-          
+
           {showSuggestions && searchQuery && filteredPatients.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="p-2 border-b border-slate-50">
@@ -96,7 +97,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                     </div>
                     <div className="flex-1">
                       <div className="text-sm font-bold text-slate-800 group-hover:text-[#5ab2b2] transition-colors">{patient.name}</div>
-                      <div className="text-[10px] text-slate-500 font-medium">{patient.id} • {patient.branch}</div>
+                      <div className="text-[10px] text-slate-500 font-medium">{patient.pid || patient.id} • {patient.branch}</div>
                     </div>
                     <div className="text-[10px] font-black text-slate-300 group-hover:text-[#5ab2b2]">VIEW</div>
                   </button>

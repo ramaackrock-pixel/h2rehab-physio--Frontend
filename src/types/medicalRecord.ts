@@ -11,6 +11,7 @@ export interface MedicalRecord {
   doctor: string;
   initials: string;
   initialsBg: string;
+  branch?: string;
 }
 
 export interface MedicalRecordStat {

@@ -20,7 +20,7 @@ export default function AppointmentModal({ appointment, isOpen, onClose, onSave 
     patientId: '',
     therapist: '',
     therapistId: '',
-    branch: branches[0]?.name || '',
+    branch: '',
     sessionType: 'Initial Consult',
     status: 'PENDING',
     details: {
@@ -34,7 +34,7 @@ export default function AppointmentModal({ appointment, isOpen, onClose, onSave 
 
   useEffect(() => {
     if (appointment) {
-      const dateStr = appointment.appointmentDate || appointment.date;
+      const dateStr = appointment.appointmentDate || (appointment as any).date;
       const formattedDate = dateStr ? new Date(dateStr).toISOString().split('T')[0] : '';
       setFormData({ ...appointment, appointmentDate: formattedDate });
     } else {
@@ -46,7 +46,7 @@ export default function AppointmentModal({ appointment, isOpen, onClose, onSave 
         patientId: '',
         therapist: '',
         therapistId: '',
-        branch: branches[0]?.name || '',
+        branch: '',
         sessionType: 'Initial Consult',
         status: 'PENDING',
         details: {
@@ -219,7 +219,9 @@ export default function AppointmentModal({ appointment, isOpen, onClose, onSave 
                   value={formData.branch}
                   onChange={handleChange}
                   className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-[#5ab2b2] focus:ring-2 focus:ring-teal-500/10 font-medium transition-all"
+                  required
                 >
+                  <option value="">Select Branch</option>
                   {branches.map(b => (
                     <option key={b.id} value={b.name}>{b.name}</option>
                   ))}
@@ -252,8 +254,12 @@ export default function AppointmentModal({ appointment, isOpen, onClose, onSave 
               >
                 <option value="PENDING">PENDING</option>
                 <option value="CONFIRMED">CONFIRMED</option>
-                <option value="COMPLETED">COMPLETED</option>
-                <option value="CANCELLED">CANCELLED</option>
+                {appointment && (
+                  <>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                  </>
+                )}
               </select>
             </div>
 

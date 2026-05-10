@@ -12,6 +12,7 @@ export type ClinicBranch = {
   address: string;
   manager: string;
   phone: string;
+  branchCode: string;
   staffCount: number;
   patientCount: number;
   totalRevenue: number;

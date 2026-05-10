@@ -19,6 +19,7 @@ import { useAppData } from '@/context/AppDataContext';
 import { useSearch } from '@/context/SearchContext';
 import { apiService } from '@/services/apiService';
 import AppointmentModal from '@/components/dashboard/AppointmentModal';
+import type { Appointment } from '@/types/appointment';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -32,10 +33,10 @@ const getLocalDateString = (d: Date = new Date()) => {
 export function Appointments() {
   const { searchQuery } = useSearch();
   const { appointments, addAppointment, updateAppointment, deleteAppointment, branches, doctors } = useAppData();
-  const [activeMenuId, setActiveMenuId] = useState<number | null>(null);
-  const [viewingAppointment, setViewingAppointment] = useState<any | null>(null);
+  const [activeMenuId, setActiveMenuId] = useState<string | number | null>(null);
+  const [viewingAppointment, setViewingAppointment] = useState<Appointment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingAppointment, setEditingAppointment] = useState<any | null>(null);
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   // Filters

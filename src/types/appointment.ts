@@ -7,12 +7,13 @@ export interface AppointmentDetails {
 }
 
 export interface Appointment {
-  id: number;
+  id: number | string;
   time: string;
-  duration: string;
+  duration: string | number;
   appointmentDate?: string;
   patientName: string;
   pid?: string;
+  patientId?: string;
   initials: string;
   initialsBg: string;
   therapist: string;

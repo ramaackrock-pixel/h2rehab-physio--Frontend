@@ -18,14 +18,11 @@ import {
   Pencil,
   Trash2,
   Plus,
-  X
+  X,
+  FileText
 } from 'lucide-react';
 import { useAppData } from '@/context/AppDataContext';
-import {
-  ATTENDANCE_RECORDS,
-  STAFF_SCHEDULES,
-  PAYROLL_RECORDS
-} from '../data/staff';
+
 import type { StaffTab, AttendanceStatus, ShiftType } from '../types/staff';
 import StaffModal from '@/components/dashboard/StaffModal';
 import { useSearch } from '@/context/SearchContext';
@@ -102,7 +99,7 @@ export function Staff() {
         </div>
 
         {/* Dynamic View */}
-        {activeTab === 'Payroll' && !(user?.role === 'admin' || user?.role === 'superadmin') ? (
+        {activeTab === 'Payroll' && user?.role !== 'superadmin' ? (
           <div className="bg-white p-12 rounded-3xl border border-slate-100 shadow-sm text-center">
             <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-400">
               <Lock size={32} />
@@ -122,14 +119,19 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
   const { searchQuery } = useSearch();
   const { staff: allStaff, branches } = useAppData();
   const [localSearch, setLocalSearch] = useState('');
+  const [branchFilter, setBranchFilter] = useState('Branch: All');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
   const staff = allStaff.filter(s => {
     const activeSearch = localSearch || searchQuery;
-    return s.name.toLowerCase().includes(activeSearch.toLowerCase()) ||
+    const matchesSearch = s.name.toLowerCase().includes(activeSearch.toLowerCase()) ||
       s.email.toLowerCase().includes(activeSearch.toLowerCase()) ||
       s.id.toLowerCase().includes(activeSearch.toLowerCase());
+
+    const matchesBranch = branchFilter === 'Branch: All' || s.branch === branchFilter;
+
+    return matchesSearch && matchesBranch;
   });
 
   const totalPages = Math.ceil(staff.length / ITEMS_PER_PAGE) || 1;
@@ -155,25 +157,25 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
             <div className="relative w-full sm:w-44 group">
-              <select className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none cursor-pointer pr-10">
-                <option>Branch: All</option>
+              <Briefcase size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <select
+                value={branchFilter}
+                onChange={(e) => { setBranchFilter(e.target.value); setCurrentPage(1); }}
+                className="w-full appearance-none bg-white border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-sm focus:outline-none cursor-pointer"
+              >
+                <option value="Branch: All">Branch: All</option>
                 {branches.map(b => (
                   <option key={b.id} value={b.name}>{b.name}</option>
                 ))}
               </select>
               <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
-            <div className="relative w-full sm:w-44 group">
-              <select className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none cursor-pointer pr-10">
-                <option>Status: All</option>
-                <option>Active</option>
-                <option>Inactive</option>
-              </select>
-              <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-            </div>
           </div>
         </div>
-        <button className="text-teal-600 text-[10px] font-bold uppercase tracking-widest hover:text-teal-700 font-bold flex items-center space-x-2 mt-2 lg:mt-0">
+        <button
+          onClick={() => { setLocalSearch(''); setBranchFilter('Branch: All'); setCurrentPage(1); }}
+          className="text-teal-600 text-[10px] font-bold uppercase tracking-widest hover:text-teal-700 font-bold flex items-center space-x-2 mt-2 lg:mt-0"
+        >
           <Filter size={14} />
           <span>Clear Filters</span>
         </button>
@@ -187,9 +189,10 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
               <th className="px-6 py-4">Role</th>
               <th className="px-6 py-4">Department</th>
               <th className="px-6 py-4">Branch</th>
-              <th className="px-6 py-4">Mobile</th>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4">Actions</th>
+              <th className="px-6 py-4">Joining Date</th>
+              <th className="px-6 py-4">Aadhar Number</th>
+              <th className="px-6 py-4 text-center">Documents</th>
+              <th className="px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
@@ -215,14 +218,22 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
                 </td>
                 <td className="px-6 py-5 text-sm text-slate-600 font-medium">{member.department}</td>
                 <td className="px-6 py-5 text-sm text-slate-600 font-medium">{member.branch}</td>
-                <td className="px-6 py-5 text-sm text-slate-600 font-medium">{member.mobile}</td>
-                <td className="px-6 py-5">
-                  <div className="flex items-center space-x-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${member.status === 'Active' ? 'bg-teal-500' : 'bg-slate-300'}`} />
-                    <span className={`text-[11px] font-bold ${member.status === 'Active' ? 'text-teal-600' : 'text-slate-400'}`}>
-                      {member.status}
-                    </span>
-                  </div>
+                <td className="px-6 py-5 text-sm text-slate-600 font-bold">{member.joiningDate || '-'}</td>
+                <td className="px-6 py-5 text-sm text-slate-500 font-medium tracking-wider">{member.aadharNumber || '-'}</td>
+                <td className="px-6 py-5 text-center">
+                  {member.degreeCertificate ? (
+                    <a
+                      href={member.degreeCertificate}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-1 text-[9px] font-black text-teal-600 hover:underline uppercase"
+                    >
+                      <FileText size={10} />
+                      <span>Certificate</span>
+                    </a>
+                  ) : (
+                    <span className="text-slate-400 text-[9px] font-bold uppercase tracking-tighter">No Files</span>
+                  )}
                 </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end space-x-2">
@@ -256,8 +267,8 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
               key={page}
               onClick={() => setCurrentPage(page)}
               className={`w-8 h-8 rounded-lg font-bold text-xs transition-all border ${currentPage === page
-                  ? 'bg-teal-600 text-white ring-2 ring-teal-500/20 border-transparent'
-                  : 'text-slate-600 hover:bg-white border-transparent hover:border-slate-200'
+                ? 'bg-teal-600 text-white ring-2 ring-teal-500/20 border-transparent'
+                : 'text-slate-600 hover:bg-white border-transparent hover:border-slate-200'
                 }`}
             >
               {page}
@@ -278,10 +289,41 @@ function StaffListView({ onEdit, onDelete }: { onEdit: (staff: any) => void, onD
 
 function AttendanceView() {
   const { staff: allStaff, updateStaff, branches } = useAppData();
+  const todayStr = new Date().toLocaleDateString('en-CA');
+  const [dateFilter, setDateFilter] = useState(todayStr);
   const [branchFilter, setBranchFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
-  const todayStr = new Date().toISOString().split('T')[0];
+
+  const calculateDuration = (inTime: string | undefined, outTime: string | undefined) => {
+    if (!inTime || !outTime) return '--';
+
+    const parseTime = (t: string) => {
+      const parts = t.split(' ');
+      const timeParts = parts[0].split(':');
+      let hours = parseInt(timeParts[0]);
+      const minutes = parseInt(timeParts[1]);
+
+      if (parts[1] === 'PM' && hours < 12) hours += 12;
+      if (parts[1] === 'AM' && hours === 12) hours = 0;
+
+      return hours * 60 + minutes;
+    };
+
+    try {
+      const inMinutes = parseTime(inTime);
+      const outMinutes = parseTime(outTime);
+      const diff = outMinutes - inMinutes;
+
+      if (diff < 0) return '--';
+
+      const h = Math.floor(diff / 60);
+      const m = diff % 60;
+      return `${h}h ${m}m`;
+    } catch (e) {
+      return '--';
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -305,10 +347,10 @@ function AttendanceView() {
 
   const saveCheckIn = (member: any, locationStr: string) => {
     const logs = [...(member.attendanceLogs || [])];
-    if (!logs.some((l: any) => l.date === todayStr)) {
+    if (!logs.some((l: any) => l.date === dateFilter)) {
       logs.push({
-        date: todayStr,
-        checkInTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date: dateFilter,
+        checkInTime: dateFilter === todayStr ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "09:00 AM",
         status: 'checked in',
         location: locationStr
       });
@@ -332,11 +374,11 @@ function AttendanceView() {
 
   const saveCheckOut = (member: any, locationStr: string) => {
     const logs = [...(member.attendanceLogs || [])];
-    const idx = logs.findIndex((l: any) => l.date === todayStr);
+    const idx = logs.findIndex((l: any) => l.date === dateFilter);
     if (idx > -1) {
       logs[idx] = {
         ...logs[idx],
-        checkOutTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        checkOutTime: dateFilter === todayStr ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "05:00 PM",
         status: 'presented today',
         location: logs[idx].location && logs[idx].location !== locationStr
           ? `${logs[idx].location} (In) / ${locationStr} (Out)`
@@ -347,8 +389,8 @@ function AttendanceView() {
   };
 
   const handleDeleteLog = (member: any) => {
-    if (confirm('Are you sure you want to remove attendance for today?')) {
-      const logs = (member.attendanceLogs || []).filter((l: any) => l.date !== todayStr);
+    if (confirm(`Are you sure you want to remove attendance for ${dateFilter}?`)) {
+      const logs = (member.attendanceLogs || []).filter((l: any) => l.date !== dateFilter);
       updateStaff({ ...member, attendanceLogs: logs });
     }
   };
@@ -368,9 +410,13 @@ function AttendanceView() {
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
           <div className="relative w-full sm:w-56 group">
             <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <div className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700">
-              {todayStr}
-            </div>
+            <input
+              type="date"
+              max={todayStr}
+              value={dateFilter}
+              onChange={(e) => { setDateFilter(e.target.value); setCurrentPage(1); }}
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+            />
           </div>
           <div className="relative w-full sm:w-64 group">
             <div className="relative">
@@ -378,14 +424,14 @@ function AttendanceView() {
               <select
                 value={branchFilter}
                 onChange={(e) => { setBranchFilter(e.target.value); setCurrentPage(1); }}
-                className="w-full appearance-none bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none cursor-pointer pr-10"
+                className="w-full appearance-none bg-white border border-slate-200 rounded-xl pl-10 pr-10 py-2.5 text-sm focus:outline-none cursor-pointer transition-all"
               >
                 <option value="All">All Branches</option>
                 {branches.map(b => (
                   <option key={b.id} value={b.name}>{b.name}</option>
                 ))}
               </select>
-              <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none bg-white" />
             </div>
           </div>
         </div>
@@ -398,15 +444,15 @@ function AttendanceView() {
               <th className="px-6 py-4">Staff Name</th>
               <th className="px-6 py-4">Date</th>
               <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4">Check-in Time</th>
-              <th className="px-6 py-4">Remarks</th>
+              <th className="px-6 py-4">In / Out</th>
+              <th className="px-6 py-4">Worked Hours</th>
               <th className="px-6 py-4">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
             {paginatedStaff.map((member) => {
-              const todayLog = (member.attendanceLogs || []).find((l: any) => l.date === todayStr);
-              const status = todayLog ? todayLog.status : 'not checked in yet';
+              const dayLog = (member.attendanceLogs || []).find((l: any) => l.date === dateFilter);
+              const status = dayLog ? dayLog.status : 'not checked in yet';
 
               return (
                 <tr key={member.id} className="hover:bg-slate-50/50 transition-all font-medium">
@@ -419,7 +465,7 @@ function AttendanceView() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-sm text-slate-500 font-bold">{todayStr}</td>
+                  <td className="px-6 py-5 text-sm text-slate-500 font-bold">{dateFilter}</td>
                   <td className="px-6 py-5">
                     <div className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full border text-[10px] font-bold ${getStatusBadge(status)}`}>
                       <div className={`w-1.5 h-1.5 rounded-full ${status === 'presented today' ? 'bg-teal-500' :
@@ -428,30 +474,44 @@ function AttendanceView() {
                       <span>{status}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-sm font-bold text-slate-700">
-                    {todayLog?.checkInTime || '-'} {todayLog?.checkOutTime ? ` / ${todayLog.checkOutTime}` : ''}
-                  </td>
-                  <td className="px-6 py-5 text-sm text-slate-400 font-medium">
-                    <div className="flex items-center gap-2">
-                      {!todayLog && (
-                        <button onClick={() => handleCheckIn(member)} className="px-3 py-1 bg-teal-50 text-teal-600 rounded text-xs font-bold hover:bg-teal-100">
-                          Check In
-                        </button>
+                  <td className="px-6 py-5">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-700">{dayLog?.checkInTime || '--'}</span>
+                      {dayLog?.checkOutTime && (
+                        <span className="text-[10px] font-bold text-slate-400">Out: {dayLog.checkOutTime}</span>
                       )}
-                      {todayLog && !todayLog.checkOutTime && (
-                        <button onClick={() => handleCheckOut(member)} className="px-3 py-1 bg-blue-50 text-blue-600 rounded text-xs font-bold hover:bg-blue-100">
-                          Check Out
-                        </button>
-                      )}
-                      {todayLog?.location && <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 truncate max-w-[100px] inline-block">{todayLog.location}</span>}
                     </div>
                   </td>
+                  <td className="px-6 py-5 text-slate-500 text-sm font-bold">
+                    {dayLog?.checkInTime && dayLog?.checkOutTime ? calculateDuration(dayLog.checkInTime, dayLog.checkOutTime) : '--'}
+                  </td>
                   <td className="px-6 py-5">
-                    {todayLog && (
-                      <button onClick={() => handleDeleteLog(member)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
-                        <Trash2 size={16} />
-                      </button>
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {dateFilter <= todayStr && (
+                        <>
+                          {(!dayLog || dayLog.status === 'checked in') && (
+                            <button
+                              onClick={() => dayLog?.status === 'checked in' ? handleCheckOut(member) : handleCheckIn(member)}
+                              className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all shadow-sm ${dayLog?.status === 'checked in'
+                                ? 'bg-orange-50 text-orange-600 border border-orange-100 hover:bg-orange-600 hover:text-white'
+                                : 'bg-teal-50 text-teal-600 border border-teal-100 hover:bg-teal-600 hover:text-white'
+                                }`}
+                            >
+                              {dayLog?.status === 'checked in' ? 'Check Out' : 'Check In'}
+                            </button>
+                          )}
+                          {dayLog && (
+                            <button
+                              onClick={() => handleDeleteLog(member)}
+                              className="p-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-full transition-all shadow-sm"
+                              title="Remove Log"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -475,8 +535,8 @@ function AttendanceView() {
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className={`w-8 h-8 rounded-lg font-bold text-xs transition-all border ${currentPage === page
-                    ? 'bg-teal-600 text-white ring-2 ring-teal-500/20 border-transparent'
-                    : 'text-slate-600 hover:bg-white border-transparent hover:border-slate-200'
+                  ? 'bg-teal-600 text-white ring-2 ring-teal-500/20 border-transparent'
+                  : 'text-slate-600 hover:bg-white border-transparent hover:border-slate-200'
                   }`}
               >
                 {page}
@@ -598,7 +658,7 @@ function SchedulesView({ onEdit }: { onEdit: (staff: any) => void }) {
       <div className="p-6 bg-slate-50/30 border-t border-slate-50 flex items-center justify-between">
         <p className="text-xs font-bold text-slate-400">Showing {paginatedStaff.length} of {filteredStaff.length} staff members</p>
         <div className="flex items-center space-x-2">
-          <button 
+          <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className="p-2 border border-slate-200 rounded-lg text-slate-400 hover:bg-white disabled:opacity-50"
@@ -606,19 +666,18 @@ function SchedulesView({ onEdit }: { onEdit: (staff: any) => void }) {
             <ChevronLeft size={16} />
           </button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button 
+            <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`w-8 h-8 rounded-lg font-bold text-xs transition-all border ${
-                currentPage === page 
-                  ? 'bg-teal-600 text-white ring-2 ring-teal-500/20 border-transparent' 
-                  : 'text-slate-600 hover:bg-white border-transparent hover:border-slate-200'
-              }`}
+              className={`w-8 h-8 rounded-lg font-bold text-xs transition-all border ${currentPage === page
+                ? 'bg-teal-600 text-white ring-2 ring-teal-500/20 border-transparent'
+                : 'text-slate-600 hover:bg-white border-transparent hover:border-slate-200'
+                }`}
             >
               {page}
             </button>
           ))}
-          <button 
+          <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
             className="p-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-white disabled:opacity-50"
@@ -758,7 +817,7 @@ function PayrollView() {
       <div className="p-6 bg-slate-50/30 border-t border-slate-50 flex items-center justify-between">
         <p className="text-xs font-bold text-slate-400">Showing {paginatedPayroll.length} of {payrollData.length} records</p>
         <div className="flex items-center space-x-2">
-          <button 
+          <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className="p-2 border border-slate-200 rounded-lg text-slate-400 hover:bg-white disabled:opacity-50"
@@ -766,19 +825,18 @@ function PayrollView() {
             <ChevronLeft size={16} />
           </button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button 
+            <button
               key={page}
               onClick={() => setCurrentPage(page)}
-              className={`w-8 h-8 rounded-lg font-bold text-xs transition-all border ${
-                currentPage === page 
-                  ? 'bg-teal-600 text-white ring-2 ring-teal-500/20 border-transparent' 
-                  : 'text-slate-600 hover:bg-white border-transparent hover:border-slate-200'
-              }`}
+              className={`w-8 h-8 rounded-lg font-bold text-xs transition-all border ${currentPage === page
+                ? 'bg-teal-600 text-white ring-2 ring-teal-500/20 border-transparent'
+                : 'text-slate-600 hover:bg-white border-transparent hover:border-slate-200'
+                }`}
             >
               {page}
             </button>
           ))}
-          <button 
+          <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
             className="p-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-white disabled:opacity-50"
@@ -817,9 +875,10 @@ function AddPayrollModal({ isOpen, onClose, currentMonth, staff, updateStaff }: 
     if (selectedStaffId) {
       const member = staff.find((s: any) => s.id === selectedStaffId);
       if (member) {
-        // Calculate days present in the selected month
+        // Calculate unique days present in the selected month
         const currentMonthLogs = (member.attendanceLogs || []).filter((l: any) => l.date.startsWith(currentMonth));
-        setFormData(prev => ({ ...prev, daysPresent: currentMonthLogs.length || '' }));
+        const uniqueDays = [...new Set(currentMonthLogs.map((l: any) => l.date))].length;
+        setFormData(prev => ({ ...prev, daysPresent: uniqueDays || '' }));
       }
     }
   }, [selectedStaffId, staff, currentMonth]);

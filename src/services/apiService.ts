@@ -9,10 +9,7 @@ const API_BASE_URL = 'http://localhost:4000/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  withCredentials: true
 });
 
 // Add a response interceptor to handle errors globally
@@ -32,7 +29,6 @@ apiClient.interceptors.response.use(
     
     // Ignore 401 Unauthorized errors on initial load, these are handled by the AuthContext/Login page usually without wanting a popup immediately on screen load
     // Actually, maybe we only ignore 401 if it's hitting specific initial routes, or we just show them.
-    // Let's show all errors except maybe initial 401s if they are an issue.
     // Given the user asked for all errors, we will show it. If it's a 401 on /login, it's fine.
     // To prevent spam on load, we can check if it's an initial load 401, but the previous AppDataContext fix already stops those.
     
@@ -50,12 +46,18 @@ export const apiService = {
   },
 
   async post(endpoint: string, data: any) {
-    const response = await apiClient.post(endpoint, data);
+    const isFormData = data instanceof FormData;
+    const response = await apiClient.post(endpoint, data, {
+      headers: !isFormData ? { 'Content-Type': 'application/json' } : {}
+    });
     return response.data;
   },
 
   async put(endpoint: string, data: any) {
-    const response = await apiClient.put(endpoint, data);
+    const isFormData = data instanceof FormData;
+    const response = await apiClient.put(endpoint, data, {
+      headers: !isFormData ? { 'Content-Type': 'application/json' } : {}
+    });
     return response.data;
   },
 
@@ -167,7 +169,7 @@ export const apiService = {
       ...data,
       id: data.id || `STF-${Math.floor(Math.random() * 10000)}`,
       department: data.department || (data.role === 'Admin / Receptionist' ? 'Administration' : 'Physiotherapy'),
-      avatar: data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'Staff')}&background=random`,
+      avatar: (data.avatar && data.avatar.trim() !== '') ? data.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'Staff')}&background=random&color=fff`,
       status: data.status || 'Active'
     } as StaffMember;
   },
