@@ -111,11 +111,12 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
           doctorService.getAll().catch(e => { console.error('Failed to fetch doctors:', e); return []; })
         ]);
 
-        setPatients((patientsData || []).map((p: any) => apiService.preparePatient({ ...p, id: p._id })));
+        const preparedPatients = (patientsData || []).map((p: any) => apiService.preparePatient({ ...p, id: p._id }));
+        setPatients(preparedPatients);
         setAppointments((appointmentsData || []).map((a: any) => apiService.prepareAppointment({ ...a, id: a._id || a.id })));
         setStaff((staffData || []).map((s: any) => ({ ...s, id: s._id || s.id })));
         setInvoices((invoicesData || []).map((i: any) => {
-          const patient = (patientsData || []).find((p: any) => p._id === i.patientId);
+          const patient = preparedPatients.find((p: any) => p.id === i.patientId);
           return { 
             ...i, 
             id: i._id || i.id,
@@ -272,10 +273,12 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const addInvoice = async (invoice: Invoice) => {
     try {
       const created = await billingService.create(invoice);
+      const patient = patients.find(p => p.id === created.patientId || p.id === invoice.patientId);
       const invoiceWithId = { 
         ...created, 
         id: created._id || created.id,
-        pid: created.patientId 
+        pid: created.patientId,
+        patientPid: patient?.pid || 'N/A'
       };
       setInvoices(prev => [invoiceWithId, ...prev]);
     } catch (err) {
@@ -285,10 +288,12 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const updateInvoice = async (invoice: Invoice) => {
     try {
       const updated = await billingService.update(invoice.id, invoice);
+      const patient = patients.find(p => p.id === updated.patientId || p.id === invoice.patientId);
       const invoiceWithId = { 
         ...updated, 
         id: updated._id || updated.id,
-        pid: updated.patientId 
+        pid: updated.patientId,
+        patientPid: patient?.pid || 'N/A'
       };
       setInvoices(prev => prev.map(i => i.id === invoice.id ? invoiceWithId : i));
     } catch (err) {
